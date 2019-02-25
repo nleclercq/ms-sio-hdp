@@ -54,3 +54,8 @@ jupyspark
 # - Executer prj-hdp-ms-sio/api-transilier/api-transilien-sncf-data.ipynb -> Des .json doivent se créer dans ton répertoire
 # - Puis executer prj-hdp-ms-sio/api-transilier/api-transilien-producer.ipynb en suivant la procédure pour intégrer ton mot de passe
 # - Ensuite executer prj-hdp-ms-sio/api-transilier/api-transilien-consumer-sparksession.ipynb et visualiser dans la console de jupyter les données (peut prendre du temps à se lancer)
+
+
+# installation du serveur Spark Thrift via Ambari
+https://community.hortonworks.com/articles/29110/querying-data-via-sparksql-with-odbc-tools.html
+
