@@ -6,6 +6,7 @@ echo ${SPARK_HOME}
 source "${SPARK_HOME}"/bin/load-spark-env.sh
 
 export PYSPARK_SUBMIT_ARGS="--packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.0 pyspark-shell"
+#export PYSPARK_SUBMIT_ARGS="--conf spark.sql.hive.thriftServer.singleSession=true --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.4.0 pyspark-shell"
 export PYTHONPATH="${SPARK_HOME}/python/:$PYTHONPATH"
 export PYTHONPATH="${SPARK_HOME}/python/lib/py4j-0.10.7-src.zip:$PYTHONPATH"
 export HADOOP_CONF_DIR=/etc/hadoop/conf
