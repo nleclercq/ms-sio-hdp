@@ -19,5 +19,5 @@
 
 """This package provides an active object implementation called Task"""
 
-from fs.utils.task.Message import Message, MessageIsNotWaitable, MessageProcessingTimeout
-from fs.utils.task.Task import Task
+from task.Message import Message, MessageIsNotWaitable, MessageProcessingTimeout
+from task.Task import Task
