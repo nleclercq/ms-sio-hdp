@@ -19,27 +19,26 @@
 
 """This module defines the Task class: a thread to which you can post messages"""
 
-from __future__ import print_function
-
-from six import PY2
-if PY2:
-    import Queue
-else:
-    import queue as Queue
-
+import queue
 import threading
 import time
 import ctypes
-
-from fs.utils.task.Message import Message, MessageInvalidIdentifier, MessageIsNotWaitable
-from fs.utils.errors import silent_catch
-
+from contextlib import contextmanager
+from task.Message import Message, MessageInvalidIdentifier, MessageIsNotWaitable
 
 # ===========================================================================
 class FsTaskKilled(Exception):
     pass
 
-
+# ===========================================================================
+@contextmanager
+def silent_catch(*args):
+    types = args or BaseException
+    try:
+        yield
+    except types:
+        pass
+    
 # ===========================================================================
 class Task(threading.Thread):
     """
@@ -62,7 +61,7 @@ class Task(threading.Thread):
         # task name
         self._task_name = task_name
         # initialize the associated message queue
-        self._msgq = Queue.PriorityQueue(msgq_wm)
+        self._msgq = queue.PriorityQueue(msgq_wm)
         # periodic message period
         self._periodic_msg_enabled = False
         self._periodic_msg_period_in_secs = 1.0
@@ -260,7 +259,7 @@ class Task(threading.Thread):
                     finally:
                         self.__pending_msg_processed()
                         self._pending_msg = None
-            except Queue.Empty:
+            except queue.Empty:
                 # call to <self._msgq.get> timed out
                 if self._periodic_msg_enabled:
                     with silent_catch():

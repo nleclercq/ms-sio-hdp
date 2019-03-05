@@ -19,7 +19,6 @@
 
 """This module defines the pyYat.Message class"""
 
-from __future__ import print_function
 import threading
 
 
@@ -80,6 +79,15 @@ class Message(object):
             else:
                 self._priority = int(msg_priority)
 
+    def __eq__(self, other):
+        return self._priority == other.priority
+    
+    def __lt__(self, other):
+        return self._priority < other.priority
+    
+    def __gt__(self, other):
+        return self._priority > other.priority
+    
     @property
     def identifier(self):
         """
