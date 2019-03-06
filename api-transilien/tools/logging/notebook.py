@@ -1,7 +1,21 @@
-#-----------------------------------------------------------------------------------------------
-# NotebookCellContent: attach logging to a specifc notebook cell   
-# This code comes from a 2017 Synchrontron SOLEIL projedct dev. by Nicolas Leclercq
-#-----------------------------------------------------------------------------------------------
+# ===========================================================================
+#  This file is part of the Flyscan Ecosystem
+#
+#  Copyright 2014-EOT N. Leclercq, Synchrotron SOLEIL, St.Aubin, France
+#
+#  This is free software: you can redistribute it and/or modify it under the
+#  terms of the GNU Lesser General Public License as published by the Free
+#  Software Foundation, either version 3 of the License, or (at your option)
+#  any later version.
+#
+#  This is distributed in the hope that it will be useful, but WITHOUT ANY
+#  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#  FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+#  more details.
+#
+#  You should have received a copy of the GNU Lesser General Public License
+#  along with This.  If not, see <http://www.gnu.org/licenses/>.
+# ===========================================================================
 
 import sys
 import logging
@@ -47,12 +61,13 @@ class CellOutput(object):
 class NotebookCellContent(object):
     default_logger = "api-transilien"
 
-    def __init__(self, name=None, logger=None, output=None):
+    def __init__(self, name, logger=None, output=None):
+        assert(name is not None)
         uuid = uuid4().hex
         self._uid = uuid
         self._name = name if name is not None else str(uuid)
         self._output = CellOutput() if output is None else output
-        self._logger = logger if logger else logging.getLogger(NotebookCellContent.default_logger)
+        self._logger = logger if logger is not None else logging.getLogger(name)
 
     @property
     def name(self):

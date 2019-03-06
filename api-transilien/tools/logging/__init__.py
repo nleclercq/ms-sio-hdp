@@ -1,1 +1,1 @@
-from notebook import *
+from .notebook import NotebookCellContent

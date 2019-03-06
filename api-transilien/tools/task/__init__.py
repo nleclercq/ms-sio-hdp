@@ -19,5 +19,5 @@
 
 """This package provides an active object implementation called Task"""
 
-from task.Message import Message, MessageIsNotWaitable, MessageProcessingTimeout
-from task.Task import Task
+from .Message import Message, MessageIsNotWaitable, MessageProcessingTimeout
+from .Task import Task
