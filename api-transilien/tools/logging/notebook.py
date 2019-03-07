@@ -59,15 +59,18 @@ class CellOutput(object):
 # NotebookCellContent
 #-----------------------------------------------------------------------------------------------
 class NotebookCellContent(object):
-    default_logger = "api-transilien"
+    
+    default_logger = "__default_logger__"
 
-    def __init__(self, name, logger=None, output=None):
+    def __init__(self, name, parent=None):
         assert(name is not None)
+        if parent is not None:
+            assert(isinstance(parent, NotebookCellContent))
         uuid = uuid4().hex
         self._uid = uuid
         self._name = name if name is not None else str(uuid)
-        self._output = CellOutput() if output is None else output
-        self._logger = logger if logger is not None else logging.getLogger(name)
+        self._output = CellOutput() if parent is None else parent.output
+        self._logger = logging.getLogger(NotebookCellContent.default_logger) if parent is None else parent.logger
 
     @property
     def name(self):
