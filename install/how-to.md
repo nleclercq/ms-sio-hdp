@@ -72,9 +72,9 @@ jupyter-lab --no-browser --ip=0.0.0.0 --port 60000 --allow-root
 ```
 
 Via votre navigateur accéder à http://localhost:60000
-Copie du token qui apparait dans la console (token=[token_à_récupérer])
-Le coller dans le navigateur (champ token) et renseigner un mot de passe associé
-Puis cliquer sur "Login and set new password"
+* Copie du token qui apparait dans la console (token=[token_à_récupérer])
+* Le coller dans le navigateur (champ token) et renseigner un mot de passe associé
+* Puis cliquer sur "Login and set new password"
 
 **Génèration d'une erreur 500, ne pas en tenir compte le mot de passe a bien été configuré**
 
