@@ -1,4 +1,4 @@
-#HOW TO
+##HOW TO
 
 Au préalable, une fois la HDP 2.6.5 installée et le mot de passe root modifié.
 
