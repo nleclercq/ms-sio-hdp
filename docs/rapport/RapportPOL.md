@@ -60,6 +60,81 @@ Les feuilles suivantes sont créées pour cette partie :
 
 Les tableaux de bord suivant sont créés pour cette partie :
 * **POS-TRAINS-LIGNE-L** : Rassemble les feuilles *TRAINS-POS* et *TRAINS-PROG* ;
+
+IMAGE_TO_DO POS-TRAINS-LIGNE-L.png
+
 * **POS-TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-POS-WITH-RAIL* et *TRAINS-PROG* ;
+
+IMAGE_TO_DO POS-TRAINS-LIGNE-L-WITH-RAIL.png
+
 * **ACCURATE-POS-TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-ACCURATE-POS-WITH-RAIL* et *TRAINS-PROG* ;
+
+IMAGE_TO_DO ACCURATE-POS-TRAINS-LIGNE-L-WITH-RAIL.png
+
 * **TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-POS-WITH-RAIL* et *TRAINS-ACCURATE-POS-WITH-RAIL*.
+
+IMAGE_TO_DO TRAINS-LIGNE-L-WITH-RAIL.png
+
+Histoire
+--------------------
+
+Les différents tableaux de bord présentés plus haut sont rassemblés dans une histoire **LINE-L** qui illustre les différentes parties de notre projet.
+
+Traitement et exploitation des données SNCF pour les rails
+=============
+
+Téléchargement des données sur les rails à l'URL suivante : https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/
+
+IMAGE_TO_DO France_Rail_Map.png
+
+Épuration des données afin de ne garder que les tronçons de la ligne L.
+
+IMAGE_TO_DO Line_L_Rail_Map.png
+
+Ces informations sont stockées dans le fichier *courbe-des-voies_L.csv* et sont exploitées via Tableau Desktop.
+
+Extraction des géopoints uniques de ces segments entre les différentes gares de la ligne, ne sont gardés que ceux des lignes principales (NOM_VOIE = V1).
+
+Line_L_GeoPoint_Map.png
+
+Calcul des suites de géopoints des trajets de la ligne L
+--------------------
+
+À partir de la structure de la ligne :
+
+IMAGE_TO_DO line-l.png
+
+Définition des branches suivantes :
+* **0** : de Paris-Saint-Lazare à Bécon-les-Bruyères ;
+	* **00** : de Bécon-les-Bruyères à Cergy-le-Haut ;
+	* **01** : de Bécon-les-Bruyères à Saint-Cloud ;
+		* **010** : de Saint-Cloud à Saint-Nom-la-Bretèche-Forêt-de-Marly ;
+			* **0100** : de Saint-Nom-la-Bretèche-Forêt-de-Marly à Saint-Germain-en-Laye-Grande-Ceinture ;
+			* **0100** : de Saint-Nom-la-Bretèche-Forêt-de-Marly à Noisy-le-Roy ;
+		* **011** : de Saint-Cloud à Versailles-Rive-Droite.
+
+Ordonnancement des différentes stations sur leur branche respective en allant de Paris vers la banlieue.
+
+Idem avec les géopoints extraits, voir plus haut.
+
+Conception et développement d'un script **generate_geopoints_path_line_l.py** permettant à partir de ces informations de calculer tous les trajets possibles de la ligne L avec leurs géopoints ordonnés et de les sauvegarder dans un fichier **scnf-paths-line-l.json**. Le script se base sur une navigation récursive au sein d'un arbre modélisant la ligne.
+
+Interpolation de la position des trains
+--------------------
+
+Les positions des trains étaient initialement calculées via une simple règle de trois à partir de :
+* La position de leur gare de départ ;
+* La position de leur gare d'arrivée ;
+* Leur progression.
+
+Nous avons évoqué cette position comme la position **courante** au sein de ce document.
+
+Cependant, dans le cas de trains directs entre des gares éloignées, ils pouvaient apparaitre à des emplacements aberrants (dans la Seine, sur des champs, etc.).
+
+Nous avons donc utilisé les informations du fichier **scnf-paths-line-l.json** afin d'interpoler leur position sur les voies ferrées via *Scipy*. Voici un exemple d'interpolation :
+
+IMAGE_TO_DO Interpolation.png
+
+Au sein de ce rapport, il s'agit de la position **affinée**. En fonction du nombre de géopoints sur un tronçon entre deux gares, différents types d'interpolation sont effectués :
+* Peu de points : **Interpolation linéaire**
+* Beaucoup de points : **Interpolation cubique**
