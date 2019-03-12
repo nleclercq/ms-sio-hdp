@@ -2,9 +2,11 @@
 ## API Transilien SNCF
 ### P.Hamy, N.Leclercq, L.Poncet
 
-1. [Rapport - PH](./docs/rapport/RapportHAP.md)
-2. [Rapport - LP](https://github.com/nleclercq/ms-sio-hdp/blob/master/docs/rapport/RapportHAP.md)
-3. [API Producer](https://github.com/nleclercq/ms-sio-hdp/blob/master/api-transilien/api-transilien-producer.ipynb)
-4. [API Consumer](https://github.com/nleclercq/ms-sio-hdp/blob/master/api-transilien/api-transilien-consumer.ipynb)
+* [Rapport](./docs/rapport/RapportHAP.md)
+* Implémentation 
+  * [Données SNCF](./api-transilien/api-transilien-sncf-data.ipynb)
+  * [API Transilien - Producteur](./api-transilien/api-transilien-producer.ipynb)
+  * [API Transilien - Consommateur](./api-transilien/api-transilien-consumer.ipynb)
+  * [Rapport - LP](./docs/rapport/RapportHAP.md)
 
 ![GitHub Logo](./api-transilien/trains-tracker.gif)
