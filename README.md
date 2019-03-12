@@ -1,10 +1,12 @@
 # PROJET HADOOP/SPARK - MS-SIO-2019
-## API Transilien SNCF - Ligne L
+## API Transilien SNCF
 ### P.Hamy, N.Leclercq, L.Poncet
 
 Transilien - Ligne L                    | Transilien - Ligne L       
 :--------------------------------------:|:-------------------------------:
 ![](./api-transilien/trains-tracker.gif)| ![](./api-transilien/line-l.png) 
+
+Bienvenue sur la page d'accueil du projet HADOOP/SPARK de Pierre Hamy, Nicolas Leclercq et Luc Poncet.
 
 * Rapport & Documentation
   * [Rapport](./docs/rapport/RapportHAP.md)
