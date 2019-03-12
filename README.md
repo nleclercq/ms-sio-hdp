@@ -6,8 +6,6 @@ Transilien - Ligne L                    | Transilien - Ligne L
 :--------------------------------------:|:-------------------------------:
 ![](./api-transilien/trains-tracker.gif)| ![](./api-transilien/line-l.png) 
 
-Bienvenue sur la page d'accueil du projet HADOOP/SPARK de Pierre Hamy, Nicolas Leclercq et Luc Poncet.
-
 * Rapport & Documentation
   * [Rapport](./docs/rapport/RapportHAP.md)
   * [Installation](./install/README.md)
