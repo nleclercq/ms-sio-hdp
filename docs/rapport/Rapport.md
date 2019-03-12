@@ -235,7 +235,7 @@ Les différents tableaux de bord présentés plus haut sont rassemblés dans une his
 Traitement et exploitation des données SNCF pour les rails
 =============
 
-* [Téléchargement](https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/) des données sur les rails.
+* Téléchargement des données sur les rails depuis le site [SNCF Open Data](https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/).
 
   ![enter image description here](./pictures/France_Rail_Map.png)
 
@@ -245,7 +245,7 @@ Traitement et exploitation des données SNCF pour les rails
 
 * Stockage de ces informations sont stockées dans le fichier [*courbe-des-voies_L.csv*](../../tableau/courbe-des-voies_L.csv) et sont exploitation via Tableau Desktop.
 
-Extraction des géopoints uniques de ces segments entre les différentes gares de la ligne, ne sont gardés que ceux des lignes principales (NOM_VOIE = V1).
+* Extraction des géopoints uniques de ces segments entre les différentes gares de la ligne, ne sont gardés que ceux des lignes principales (NOM_VOIE = V1).
 
   ![enter image description here](./pictures/Line_L_GeoPoint_Map.png)
 
