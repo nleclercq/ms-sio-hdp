@@ -1,8 +1,10 @@
 # PROJET HADOOP/SPARK - MS-SIO-2019
-## API Transilien SNCF
+## API Transilien SNCF - Ligne L
 ### P.Hamy, N.Leclercq, L.Poncet
 
-<img src="./api-transilien/line-l.png" alt="Transilien Ligne L" width="650" align="middle">
+Transilien - Ligne L                    | Transilien - Ligne L       
+:--------------------------------------:|:-------------------------------:
+![](./api-transilien/trains-tracker.gif)| ![](./api-transilien/line-l.png) 
 
 * Notes & Rapport
   * [Rapport](./docs/rapport/RapportHAP.md)
@@ -13,4 +15,3 @@
 * Annexes
   * [Données SNCF](./api-transilien/api-transilien-sncf-data.ipynb)
 
-![](./api-transilien/trains-tracker.gif)
