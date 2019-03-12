@@ -2,7 +2,7 @@
 ## API Transilien SNCF
 ### P.Hamy, N.Leclercq, L.Poncet
 
-<img src="./api-transilien/line-l.png" width="700" class="center">
+<img src="./api-transilien/line-l.png" alt="Transilien Ligne L" width="650" align="middle">
 
 * Notes & Rapport
   * [Rapport](./docs/rapport/RapportHAP.md)
