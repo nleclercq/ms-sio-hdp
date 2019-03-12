@@ -3,8 +3,13 @@ Rapport de projet Hadoop - Transilien
 P.Hamy, N.Leclercq, L.Poncet
 --
 
+Introduction
+==========
+
+
+
 Installation
-======
+=========
 Les instructions complètes d’installation et de configuration du projet sont fournie sur le dépôt github sous forme de fichier markdown  dans le dossier "install".
 
 **Les points principaux sont rappelés ci-après :** 
@@ -24,7 +29,7 @@ Travail préliminaire
 
 Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des stations de la ligne L, ainsi que leur nom et leur position géographique : 
 
-![Extrait de transilien_ligne_l_by_code.json](http://onea.me/hadoop/liste_stations.png)
+![Extrait de transilien_ligne_l_by_code.json](./pictures/liste_stations.png)
  
 **Étapes principales :** 
 
@@ -80,7 +85,7 @@ On instancie un KafkaProducerTask en lui passant en paramètres ce fichier de con
 
 Pour faire les requêtes à l’API Transilien, on itère sur nos login/mdp et sur les stations. Chaque exécution fera donc 3 requêtes : une par couple login/mdp et pour une station différente à chaque fois :
 
-![Exemple resultat producer](http://onea.me/hadoop/producer.png)
+![Exemple resultat producer](./pictures/producer.png)
 
 Consumer Kafka
 ===
@@ -102,7 +107,7 @@ Les étapes principales sont les suivantes :
 * Création d'une aggrégation contenant : 
     * le nombre *nt* de trains sur la période 
     * le temps moyen *awt* d'attente sur la période
-  ![enter image description here](http://onea.me/hadoop/dataframe.png)
+  ![enter image description here](./pictures/dataframe.png)
 
 
 Partie I & II : Calcul des temps d'attente et de la progression des trains
@@ -128,8 +133,8 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I et 
     * Configuration du serveur thrift local
 * Instanciation de la classe *TransilienStreamProcessor*
 
-![enter image description here](http://onea.me/hadoop/toPandas1.png)
-![enter image description here](http://onea.me/hadoop/toPandas2.png)
+![enter image description here](./toPandas1.png)
+![enter image description here](./toPandas2.png)
 
 
 > Written with [StackEdit](https://stackedit.io/).
