@@ -13,7 +13,7 @@ Une solution alternative de visualisation de la position des train est proposée 
 
 Installation
 =========
-Les instructions complètes d’installation et de configuration du projet sont fournie sur le dépôt github sous forme de fichier markdown  dans le dossier ["install"](../../install).
+Les instructions complètes d’installation et de configuration du projet sont fournie sur le dépôt github sous forme de fichier markdown  dans le dossier [install](../../install).
 
 **Les points principaux sont rappelés ci-après :** 
 * Installation de la Sandbox HDP Hortonworks ;
@@ -49,10 +49,18 @@ Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des s
     * nom de la station.
 * Ajout d’une station manquante ;
 * Tri par ordre croissant des stations ;
-* Récupération des positions géographiques des stations de la ligne L.
+* Ajout des coordonnées GPS des stations de la ligne L.
 
 Producer Kafka
-===
+============
+L'ensemble des opérations décrites ci-après correspondent au code du [notebook api-transilien-producer.ipynb](../../api-transilien/api-transilien-producer.ipynb)
+Les étapes principales sont les suivantes :
+
+* L'API transilien renvoie au formal XML les heures de passage des prochains train à la station pour laquelle on a fait une requête. On obtient pour chaque train les informations suivantes : numéro du train, date et heure de passage, mission, terminus du train.
+* Transformation des données XML en dictionnaire python à l'aide de ``xmltodict``. Suppression des trains n'appartenant pas à la ligne L (ceux pour lesquels le terminus ne fait pas parti des stations de la ligne L). Réagencement des données dans le dictionnaire. Conversion au format JSON grâce aux classes ``Converter`` et ``JsonConverter``.
+* Utilisation de la class ``KafkaProducerTask`` pour alimenter Kafka en donnée.
+
+
 Utilitaires
 ---
 On définit au préalable les utilitaires suivants :
@@ -151,7 +159,7 @@ Connexion au serveur Thrift local et sources de données
 
 Depuis l'onglet source de données dans Tableau Desktop, ajout d'une nouvelle connexion de type **Spark SQL**. Le formulaire doit être rempli comme suit :
 
-IMAGE_TO_DO Connexion_Tableau_Spark_SQL.png
+./pictures/Connexion_Tableau_Spark_SQL.png
 
 Afin de récupérer une vue temporaire créée depuis Spark, il est nécessaire d'ajouter une **Nouvelle requête SQL personnalisée** à la source de données. Elle doit avoir la forme suivante :
 
@@ -192,7 +200,7 @@ Les feuilles suivantes sont créées pour cette partie :
 
 Elles sont rassemblées dans un unique tableau de bord **TAM-LIGNE-L** :
 
-IMAGE_TO_DO TAM-LIGNE-L.png
+./pictures/TAM-LIGNE-L.png
 
 Partie 2
 --------------------
@@ -206,19 +214,19 @@ Les feuilles suivantes sont créées pour cette partie :
 Les tableaux de bord suivant sont créés pour cette partie :
 * **POS-TRAINS-LIGNE-L** : Rassemble les feuilles *TRAINS-POS* et *TRAINS-PROG* ;
 
-IMAGE_TO_DO POS-TRAINS-LIGNE-L.png
+./pictures/POS-TRAINS-LIGNE-L.png
 
 * **POS-TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-POS-WITH-RAIL* et *TRAINS-PROG* ;
 
-IMAGE_TO_DO POS-TRAINS-LIGNE-L-WITH-RAIL.png
+./pictures/POS-TRAINS-LIGNE-L-WITH-RAIL.png
 
 * **ACCURATE-POS-TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-ACCURATE-POS-WITH-RAIL* et *TRAINS-PROG* ;
 
-IMAGE_TO_DO ACCURATE-POS-TRAINS-LIGNE-L-WITH-RAIL.png
+./pictures/ACCURATE-POS-TRAINS-LIGNE-L-WITH-RAIL.png
 
 * **TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-POS-WITH-RAIL* et *TRAINS-ACCURATE-POS-WITH-RAIL*.
 
-IMAGE_TO_DO TRAINS-LIGNE-L-WITH-RAIL.png
+./pictures/TRAINS-LIGNE-L-WITH-RAIL.png
 
 Histoire
 --------------------
@@ -230,24 +238,24 @@ Traitement et exploitation des données SNCF pour les rails
 
 Téléchargement des données sur les rails à l'URL suivante : https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/
 
-IMAGE_TO_DO France_Rail_Map.png
+./pictures/France_Rail_Map.png
 
 Épuration des données afin de ne garder que les tronçons de la ligne L.
 
-IMAGE_TO_DO Line_L_Rail_Map.png
+./pictures/Line_L_Rail_Map.png
 
 Ces informations sont stockées dans le fichier *courbe-des-voies_L.csv* et sont exploitées via Tableau Desktop.
 
 Extraction des géopoints uniques de ces segments entre les différentes gares de la ligne, ne sont gardés que ceux des lignes principales (NOM_VOIE = V1).
 
-Line_L_GeoPoint_Map.png
+./pictures/Line_L_GeoPoint_Map.png
 
 Calcul des suites de géopoints des trajets de la ligne L
 --------------------
 
 À partir de la structure de la ligne :
 
-IMAGE_TO_DO line-l.png
+./pictures/line-l.png
 
 Définition des branches suivantes :
 * **0** : de Paris-Saint-Lazare à Bécon-les-Bruyères ;
@@ -278,7 +286,7 @@ Cependant, dans le cas de trains directs entre des gares éloignées, ils pouvaien
 
 Nous avons donc utilisé les informations du fichier **scnf-paths-line-l.json** afin d'interpoler leur position sur les voies ferrées via *Scipy*. Voici un exemple d'interpolation :
 
-IMAGE_TO_DO Interpolation.png
+./pictures/Interpolation.png
 
 Au sein de ce rapport, il s'agit de la position **affinée**. En fonction du nombre de géopoints sur un tronçon entre deux gares, différents types d'interpolation sont effectués :
 * Peu de points : **Interpolation linéaire**
