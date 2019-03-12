@@ -2,7 +2,7 @@
 ## API Transilien SNCF
 ### P.Hamy, N.Leclercq, L.Poncet
 
-![](./api-transilien/line-l.png)
+<img src="./api-transilien/line-l.png" width="700" class="center">
 
 * Notes & Rapport
   * [Rapport](./docs/rapport/RapportHAP.md)
