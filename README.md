@@ -2,7 +2,7 @@
 ## API Transilien SNCF
 ### P.Hamy, N.Leclercq, L.Poncet
 
-![GitHub Logo](./api-transilien/line-l.png)
+![](./api-transilien/line-l.png=400x)
 
 * Notes & Rapport
   * [Rapport](./docs/rapport/RapportHAP.md)
@@ -12,4 +12,5 @@
   * [Visualisation Tableau Software](./docs/rapport/RapportPOL.md)
 * Annexes
   * [Données SNCF](./api-transilien/api-transilien-sncf-data.ipynb)
-![GitHub Logo](./api-transilien/trains-tracker.gif)
+
+![](./api-transilien/trains-tracker.gif)
