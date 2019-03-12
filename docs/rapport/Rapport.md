@@ -7,9 +7,9 @@ Introduction
 ==========
 Le but de ce projet est de mettre en œuvre les différents outils de l'écosystème Hadoop en utilisant la Sandbox [Hortonworks HDP](https://www.cloudera.com/downloads/hortonworks-sandbox.html) ainsi que l'outil de visualisation [Tableau](https://www.tableau.com/).
 
-Les données utilisées sont celles de l'[API temps réel Transilien](https://ressources.data.sncf.com/explore/dataset/api-temps-reel-transilien/information/). Nous nous intéressons en particulier à la ligne L dont nous allons calculer (**en temps réel?**) les temps d'attente moyens par station et la position des trains sur la ligne et visualiser ces résultats dans Tableau.
+Les données utilisées sont celles de l'[API temps réel Transilien](https://ressources.data.sncf.com/explore/dataset/api-temps-reel-transilien/information/). Nous nous intéressons en particulier à la ligne L dont nous allons calculer en temps réel les temps d'attente moyens par station et la position des trains sur la ligne et visualiser ces résultats dans Tableau.
 
-Une solution alternative de visualisation de la position des train est proposée en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
+La solution décrite permet de répondre à l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des train est proposée en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
 
 Installation
 =========
@@ -30,11 +30,9 @@ Les instructions complètes d’installation et de configuration du projet sont fou
 Travail préliminaire
 ==
 
-Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des stations de la ligne L, ainsi que leur nom et leur position géographique : 
-
-![Extrait de transilien_ligne_l_by_code.json](./pictures/liste_stations.png)
+Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des stations de la ligne L, ainsi que leur nom et leur position géographique.
  
-**Étapes principales :** 
+**Les étapes principales sont les suivantes :** 
 
 * Téléchargement et enregistrement dans des fichiers .JSON suivants depuis 
 [le site open data SNCF](https://ressources.data.sncf.com/) : 
@@ -44,18 +42,17 @@ Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des s
 |``sncf-lignes-par-gares-idf.json``|Liste des lignes passant par chaque station du réseau transilien.|
 |``sncf-gares-et-arrets-transilien-ile-de-france.json``|	Liste des stations du réseau avec les coordonnées géographiques. |
 
-* Tri pour ne conserver que les stations de la ligne L et les informations suivantes : 
-    * code UIC ;
-    * nom de la station.
-* Ajout d’une station manquante ;
-* Tri par ordre croissant des stations ;
-* Ajout des coordonnées GPS des stations de la ligne L.
+* Tri dans les données : conservation des stations de la ligne L uniquement (code_uic et nome de la station), ajout des données d'une station manquante, tri par ordre croissant des stations ;
+* Ajout des coordonnées GPS des stations.
+
+
+![Extrait de transilien_ligne_l_by_code.json](./pictures/liste_stations.png)
 
 Producer Kafka
 ============
 L'ensemble des opérations décrites ci-après correspondent au code du [notebook api-transilien-producer.ipynb](../../api-transilien/api-transilien-producer.ipynb)
 
-Les étapes principales sont les suivantes :
+**Les étapes principales sont les suivantes :**
 
 * L'API transilien renvoie au formal XML les heures de passage des prochains train à la station pour laquelle on a fait une requête. On obtient pour chaque train les informations suivantes : numéro du train, date et heure de passage, mission, terminus du train.
 * Transformation des données XML en dictionnaire python à l'aide de ``xmltodict``. Suppression des trains n'appartenant pas à la ligne L (ceux pour lesquels le terminus ne fait pas parti des stations de la ligne L). Réagencement des données dans le dictionnaire. Conversion au format JSON grâce aux classes ``Converter`` et ``JsonConverter``.
@@ -66,7 +63,7 @@ Utilitaires
 ------------
 On a recours aux utilitaires suivants :
 * **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
-* **NotebookCellContent** : classe permettant le logging asynchrone ;
+* **NotebookCellContent** : classe permettant de router les logs vers une  ;
 * **Logging** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
 * **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
@@ -84,8 +81,8 @@ Les classes filles de Converter ont pour rôle de convertir les données préformat
 Cette classe exécute périodiquement une requête sur l’API transilien et injecte les données retournées dans un stream Kafka.
 
 Producer Kafka
----
-Pour la configuration du producer, on utilise un dictionnaire contenant les informations suivantes : 
+-------------------
+Pour la configuration du *producer*, on utilise un dictionnaire contenant les informations suivantes : 
 * Niveau de débogage ;
 * Nom du fichier ``api_transilien_login_json`` ;
 * Adresse et port du bootstrap server ;
@@ -93,7 +90,7 @@ Pour la configuration du producer, on utilise un dictionnaire contenant les info
 * API polling period.
 
 
-On instancie un KafkaProducerTask en lui passant en paramètres ce fichier de configuration et on lance ce producer de façon asynchrone.
+On instancie un ``KafkaProducerTask`` en lui passant en paramètres ce fichier de configuration et on lance ce *producer* de façon asynchrone.
 
 Pour faire les requêtes à l’API Transilien, on itère sur nos login/mdp et sur les stations. Chaque exécution fera donc 3 requêtes : une par couple login/mdp et pour une station différente à chaque fois :
 
