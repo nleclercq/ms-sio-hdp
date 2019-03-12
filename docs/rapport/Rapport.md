@@ -54,6 +54,7 @@ Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des s
 Producer Kafka
 ============
 L'ensemble des opérations décrites ci-après correspondent au code du [notebook api-transilien-producer.ipynb](../../api-transilien/api-transilien-producer.ipynb)
+
 Les étapes principales sont les suivantes :
 
 * L'API transilien renvoie au formal XML les heures de passage des prochains train à la station pour laquelle on a fait une requête. On obtient pour chaque train les informations suivantes : numéro du train, date et heure de passage, mission, terminus du train.
@@ -62,15 +63,15 @@ Les étapes principales sont les suivantes :
 
 
 Utilitaires
----
-On définit au préalable les utilitaires suivants :
-* Task : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
-* NotebookCellContent : classe permettant le logging asynchrone ;
-* Logging : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
-* Credentials : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
+------------
+On a recours aux utilitaires suivants :
+* **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
+* **NotebookCellContent** : classe permettant le logging asynchrone ;
+* **Logging** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
+* **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
-Classes
---
+Description des Classes
+----------------------------
 ### TransilienAPI
 Cette classe a les deux fonctions principales suivantes : 
 * Faire des requêtes sur l'API transilien ;
@@ -148,8 +149,6 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I et 
 ![enter image description here](./toPandas2.png)
 
 
-> Written with [StackEdit](https://stackedit.io/).
-
 
 Tableau Desktop
 =============
@@ -159,7 +158,7 @@ Connexion au serveur Thrift local et sources de données
 
 Depuis l'onglet source de données dans Tableau Desktop, ajout d'une nouvelle connexion de type **Spark SQL**. Le formulaire doit être rempli comme suit :
 
-./pictures/Connexion_Tableau_Spark_SQL.png
+  ![enter image description here](./pictures/Connexion_Tableau_Spark_SQL.png)
 
 Afin de récupérer une vue temporaire créée depuis Spark, il est nécessaire d'ajouter une **Nouvelle requête SQL personnalisée** à la source de données. Elle doit avoir la forme suivante :
 
@@ -200,7 +199,7 @@ Les feuilles suivantes sont créées pour cette partie :
 
 Elles sont rassemblées dans un unique tableau de bord **TAM-LIGNE-L** :
 
-./pictures/TAM-LIGNE-L.png
+  ![enter image description here](./pictures/TAM-LIGNE-L.png)
 
 Partie 2
 --------------------
@@ -214,19 +213,19 @@ Les feuilles suivantes sont créées pour cette partie :
 Les tableaux de bord suivant sont créés pour cette partie :
 * **POS-TRAINS-LIGNE-L** : Rassemble les feuilles *TRAINS-POS* et *TRAINS-PROG* ;
 
-./pictures/POS-TRAINS-LIGNE-L.png
+  ![enter image description here](./pictures/POS-TRAINS-LIGNE-L.png)
 
 * **POS-TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-POS-WITH-RAIL* et *TRAINS-PROG* ;
 
-./pictures/POS-TRAINS-LIGNE-L-WITH-RAIL.png
+  ![enter image description here](./pictures/POS-TRAINS-LIGNE-L-WITH-RAIL.png)
 
 * **ACCURATE-POS-TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-ACCURATE-POS-WITH-RAIL* et *TRAINS-PROG* ;
 
-./pictures/ACCURATE-POS-TRAINS-LIGNE-L-WITH-RAIL.png
+  ![enter image description here](./pictures/ACCURATE-POS-TRAINS-LIGNE-L-WITH-RAIL.png)
 
 * **TRAINS-LIGNE-L-WITH-RAIL** : Rassemble les feuilles *TRAINS-POS-WITH-RAIL* et *TRAINS-ACCURATE-POS-WITH-RAIL*.
 
-./pictures/TRAINS-LIGNE-L-WITH-RAIL.png
+  ![enter image description here](./pictures/TRAINS-LIGNE-L-WITH-RAIL.png)
 
 Histoire
 --------------------
@@ -238,24 +237,24 @@ Traitement et exploitation des données SNCF pour les rails
 
 Téléchargement des données sur les rails à l'URL suivante : https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/
 
-./pictures/France_Rail_Map.png
+  ![enter image description here](./pictures/France_Rail_Map.png)
 
 Épuration des données afin de ne garder que les tronçons de la ligne L.
 
-./pictures/Line_L_Rail_Map.png
+  ![enter image description here](./pictures/Line_L_Rail_Map.png)
 
 Ces informations sont stockées dans le fichier *courbe-des-voies_L.csv* et sont exploitées via Tableau Desktop.
 
 Extraction des géopoints uniques de ces segments entre les différentes gares de la ligne, ne sont gardés que ceux des lignes principales (NOM_VOIE = V1).
 
-./pictures/Line_L_GeoPoint_Map.png
+  ![enter image description here](./pictures/Line_L_GeoPoint_Map.png)
 
 Calcul des suites de géopoints des trajets de la ligne L
 --------------------
 
 À partir de la structure de la ligne :
 
-./pictures/line-l.png
+  ![enter image description here](./pictures/line-l.png)
 
 Définition des branches suivantes :
 * **0** : de Paris-Saint-Lazare à Bécon-les-Bruyères ;
@@ -286,7 +285,7 @@ Cependant, dans le cas de trains directs entre des gares éloignées, ils pouvaien
 
 Nous avons donc utilisé les informations du fichier **scnf-paths-line-l.json** afin d'interpoler leur position sur les voies ferrées via *Scipy*. Voici un exemple d'interpolation :
 
-./pictures/Interpolation.png
+  ![enter image description here](./pictures/Interpolation.png)
 
 Au sein de ce rapport, il s'agit de la position **affinée**. En fonction du nombre de géopoints sur un tronçon entre deux gares, différents types d'interpolation sont effectués :
 * Peu de points : **Interpolation linéaire**
