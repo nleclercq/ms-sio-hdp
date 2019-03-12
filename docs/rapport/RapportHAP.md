@@ -117,8 +117,7 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I et 
     * *setup_trains_progression_stream*
     * *computeTrainsProgressionAndSaveAsTempView*
 
-
-Les principales étapes de fonctionnement sont les suivantes  :
+### Étapes principales de fonctionnement du consumer 
 * Import des packages Python requis
 * Mise en place du logging
 * Définition de paramètres de configuration :
@@ -127,9 +126,10 @@ Les principales étapes de fonctionnement sont les suivantes  :
     * Source Kafka (broker et topic)
     * Fenêtre du stream Kafka
     * Configuration du serveur thrift local
-* Instanciation de la *TransilienStreamProcessor*
+* Instanciation de la classe *TransilienStreamProcessor*
 
 ![enter image description here](http://onea.me/hadoop/toPandas1.png)
 ![enter image description here](http://onea.me/hadoop/toPandas2.png)
+
 
 > Written with [StackEdit](https://stackedit.io/).
