@@ -6,8 +6,9 @@ Transilien - Ligne L                    | Transilien - Ligne L
 :--------------------------------------:|:-------------------------------:
 ![](./api-transilien/trains-tracker.gif)| ![](./api-transilien/line-l.png) 
 
-* Notes & Rapport
+* Rapport & Documentation
   * [Rapport](./docs/rapport/RapportHAP.md)
+  * [Installation](./install/README.md.md)
 * Implémentation 
   * [API Transilien - Producteur](./api-transilien/api-transilien-producer.ipynb)
   * [API Transilien - Consommateur](./api-transilien/api-transilien-consumer.ipynb)
