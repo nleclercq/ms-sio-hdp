@@ -130,7 +130,7 @@ class Task(threading.Thread):
         """
         self.start_synchronously()
 
-    def start_synchronously(self, tmo_sec=5.0):
+    def start_synchronously(self, tmo_sec=30.0):
         """
         Starts the Task synchronously (i.e. waits for the 'on_init' function to return).
         """
