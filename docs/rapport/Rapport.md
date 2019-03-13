@@ -1,128 +1,137 @@
 Rapport de projet Hadoop - Transilien
 =============================
+
 P.Hamy, N.Leclercq, L.Poncet
 --
 
 Introduction
 ==========
-Le but de ce projet est de mettre en œuvre les différents outils de l'écosystème Hadoop en utilisant la Sandbox [Hortonworks HDP](https://www.cloudera.com/downloads/hortonworks-sandbox.html) ainsi que l'outil de visualisation [Tableau](https://www.tableau.com/).
 
-Les données utilisées sont celles de l'[API temps réel Transilien](https://ressources.data.sncf.com/explore/dataset/api-temps-reel-transilien/information/). Nous nous intéressons en particulier à la ligne L dont nous allons calculer en temps réel les temps d'attente moyens par station et la position des trains sur la ligne et visualiser ces résultats dans Tableau.
+Le but de ce projet est de mettre en Å“uvre les diffÃ©rents outils de l'Ã©cosystÃ¨me Hadoop en utilisant la Sandbox [Hortonworks HDP](https://www.cloudera.com/downloads/hortonworks-sandbox.html) ainsi que l'outil de visualisation [Tableau](https://www.tableau.com/).
 
-La solution décrite permet de répondre à l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des train est proposée en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
+Les donnÃ©es utilisÃ©es sont celles de l'[API temps rÃ©el Transilien](https://ressources.data.sncf.com/explore/dataset/api-temps-reel-transilien/information/). Nous nous intÃ©ressons en particulier Ã  la ligne L dont nous allons calculer en temps rÃ©el les temps d'attente moyens par station et la position des trains sur la ligne et visualiser ces rÃ©sultats dans Tableau.
+
+La solution dÃ©crite permet de rÃ©pondre Ã  l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des trains est proposÃ©e en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
 
 Installation
 =========
-Les instructions complètes d’installation et de configuration du projet sont fournie sur le dépôt github sous forme de fichier markdown  dans le dossier [install](../../install).
 
-**Les points principaux sont rappelés ci-après :** 
+Les instructions complÃ¨tes dâ€™installation et de configuration du projet sont fournie sur le dÃ©pÃ´t github sous forme de fichier markdown dans le dossier [install](../../install).
+
+**Les points principaux sont rappelÃ©s ci-aprÃ¨s :** 
 * Installation de la Sandbox HDP Hortonworks ;
 * Configuration de la timezone de la Sandbox ;
-* Installation des paquets et dépendances (Miniconda, Git, JupyterLab) ;
+* Installation des paquets et dÃ©pendances (Miniconda, Git, JupyterLab) ;
 * Configuration de JupyterLab ;
 * Configuration de Git ;
-* Configuration de la durée de rétention des messages dans Kafka.
+* Configuration de la durÃ©e de rÃ©tention des messages dans Kafka.
 
 **Sur la machine locale :**
-* Récupération du repository git ;
+* RÃ©cupÃ©ration du repository git ;
 * Configuration de Tableau Software.
 
-Travail préliminaire
+Travail prÃ©liminaire
 ==
 
-Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des stations de la ligne L, ainsi que leur nom et leur position géographique.
+CrÃ©ation du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des stations de la ligne L, ainsi que leur nom et leur position gÃ©ographique.
  
-**Les étapes principales sont les suivantes :** 
+**Les Ã©tapes principales sont les suivantes :** 
 
-* Téléchargement et enregistrement dans des fichiers .JSON suivants depuis 
+* TÃ©lÃ©chargement et enregistrement dans des fichiers .JSON suivants depuis 
 [le site open data SNCF](https://ressources.data.sncf.com/) : 
 
 | Fichier                    | Description         |
 | :--------------------------| :-------------------|
-|``sncf-lignes-par-gares-idf.json``|Liste des lignes passant par chaque station du réseau transilien.|
-|``sncf-gares-et-arrets-transilien-ile-de-france.json``|	Liste des stations du réseau avec les coordonnées géographiques. |
+|``sncf-lignes-par-gares-idf.json``|Liste des lignes passant par chaque station du rÃ©seau transilien.|
+|``sncf-gares-et-arrets-transilien-ile-de-france.json``|	Liste des stations du rÃ©seau avec les coordonnÃ©es gÃ©ographiques. |
 
-* Tri dans les données : conservation des stations de la ligne L uniquement (code_uic et nome de la station), ajout des données d'une station manquante, tri par ordre croissant des stations ;
-* Ajout des coordonnées GPS des stations.
+* Tri dans les donnÃ©es : conservation des stations de la ligne L uniquement (code_uic et nome de la station), ajout des donnÃ©es d'une station manquante, tri par ordre croissant des stations ;
+* Ajout des coordonnÃ©es GPS des stations.
 
 
 ![Extrait de transilien_ligne_l_by_code.json](./pictures/liste_stations.png)
 
 Producer Kafka
 ============
-L'ensemble des opérations décrites ci-après correspondent au code du [notebook api-transilien-producer.ipynb](../../api-transilien/api-transilien-producer.ipynb)
 
-**Les étapes principales sont les suivantes :**
+L'ensemble des opÃ©rations dÃ©crites ci-aprÃ¨s correspondent au code du [notebook api-transilien-producer.ipynb](../../api-transilien/api-transilien-producer.ipynb)
 
-* L'API transilien renvoie au formal XML les heures de passage des prochains train à la station pour laquelle on a fait une requête. On obtient pour chaque train les informations suivantes : numéro du train, date et heure de passage, mission, terminus du train.
-* Transformation des données XML en dictionnaire python à l'aide de ``xmltodict``. Suppression des trains n'appartenant pas à la ligne L (ceux pour lesquels le terminus ne fait pas parti des stations de la ligne L). Réagencement des données dans le dictionnaire. Conversion au format JSON grâce aux classes ``Converter`` et ``JsonConverter``.
-* Utilisation de la class ``KafkaProducerTask`` pour alimenter Kafka en donnée.
+**Les Ã©tapes principales sont les suivantes :**
+
+* L'API transilien renvoie au formal XML les heures de passage des prochains trains Ã  la station pour laquelle on a fait une requÃªte. On obtient pour chaque train les informations suivantes : numÃ©ro du train, date et heure de passage, mission, terminus du train.
+* Transformation des donnÃ©es XML en dictionnaire python Ã  l'aide de ``xmltodict``. Suppression des trains n'appartenant pas Ã  la ligne L (ceux pour lesquels le terminus ne fait pas parti des stations de la ligne L). RÃ©agencement des donnÃ©es dans le dictionnaire. Conversion au format JSON grÃ¢ce aux classes ``Converter`` et ``JsonConverter``.
+* Utilisation de la class ``KafkaProducerTask`` pour alimenter Kafka en donnÃ©e.
 
 
 Utilitaires
 ------------
+
 On a recours aux utilitaires suivants :
-* **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
-* **NotebookCellContent** : classe permettant de router les logs vers une  ;
-* **Logging** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
-* **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
+* **Task** : classe permettant d'exÃ©cuter pÃ©riodiquement une requÃªte Ã  l'API transilien et l'envoi dans un stream Kafka ;
+* **NotebookCellContent** : classe permettant de router les logs vers une cellule cible du notebook ;
+* **Logging** : event logging en utilisant la bibliothÃ¨que python [logging](https://docs.python.org/3/library/logging.html)  ;
+* **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accÃ¨s Ã  l'API Transilien.
 
 Description des Classes
 ----------------------------
+
 ### TransilienAPI
 Cette classe a les deux fonctions principales suivantes : 
-* Faire des requêtes sur l'API transilien ;
-* Convertir les données reçues au format XML en JSON.
+* Faire des requÃªtes sur l'API transilien ;
+* Convertir les donnÃ©es reÃ§ues au format XML en JSON.
 
 ### Converter et JsonConverter
-Les classes filles de Converter ont pour rôle de convertir les données préformatées par l’API transilien en un format différent. JsonConverter hérite de Converter et prend en charge le format JSON.
+Les classes filles de Converter ont pour rÃ´le de convertir les donnÃ©es prÃ©formatÃ©es par lâ€™API transilien en un format diffÃ©rent. JsonConverter hÃ©rite de Converter et prend en charge le format JSON.
 
 ### KafkaProducerTask
-Cette classe exécute périodiquement une requête sur l’API transilien et injecte les données retournées dans un stream Kafka.
+Cette classe exÃ©cute pÃ©riodiquement une requÃªte sur lâ€™API transilien et injecte les donnÃ©es retournÃ©es dans un stream Kafka.
 
 Producer Kafka
 -------------------
+
 Pour la configuration du *producer*, on utilise un dictionnaire contenant les informations suivantes : 
-* Niveau de débogage ;
+* Niveau de dÃ©bogage ;
 * Nom du fichier ``api_transilien_login_json`` ;
 * Adresse et port du bootstrap server ;
 * Topic Kafka ;
 * API polling period.
 
 
-On instancie un ``KafkaProducerTask`` en lui passant en paramètres ce fichier de configuration et on lance ce *producer* de façon asynchrone.
+On instancie un ``KafkaProducerTask`` en lui passant en paramÃ¨tres ce fichier de configuration et on lance ce *producer* de faÃ§on asynchrone.
 
-Pour faire les requêtes à l’API Transilien, on itère sur nos login/mdp et sur les stations. Chaque exécution fera donc 3 requêtes : une par couple login/mdp et pour une station différente à chaque fois :
+Pour faire les requÃªtes Ã  lâ€™API Transilien, on itÃ¨re sur nos login/mdp et sur les stations. Chaque exÃ©cution fera donc 3 requÃªtes : une par couple login/mdp et pour une station diffÃ©rente Ã  chaque fois :
 
 ![Exemple resultat producer](./pictures/producer.png)
 
 Consumer Kafka
 ===
+
 Partie I : Calcul moyen du temps d'attente moyen par station
 ---
-On explique dans cette partie la façon dont on répond à la question du calcul du temps moyen d'attente par station sur toute la ligne.
 
-Les étapes principales sont les suivantes : 
+On explique dans cette partie la faÃ§on dont on rÃ©pond Ã  la question du calcul du temps moyen d'attente par station sur toute la ligne.
+
+Les Ã©tapes principales sont les suivantes : 
 * Import des packages (dont ``SparkSessions`` depuis ``pyspark.sql`` ; ``Window`` depuis ``pyspark.sql.window``) ;
-* Mise en place du logging (utilisation de ``NotebookCellContent`` défini plus haut, et de [Py4J](https://www.py4j.org/)) ;
-* Création d'une session Spark ;
-* Création d'un [Structured Spark Stream](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) à partir d'un flux Kafka ;
-* Désérialisation et formatage des messages grâce à la fonction Spark ``fromJson`` :
-    * Utilisation d'un schéma JSON ;
-    * Définition du format des *timestamp*.
- * Configuration de la fenêtre : *watermark*, *window length*, *sliding interval* ;
- * ``GroupBy`` par station et pour la fenêtre définie ;
-* Suppression des doublons de couples (train, heure de départ) ;
-* Création d'une aggrégation contenant : 
-    * le nombre *nt* de trains sur la période 
-    * le temps moyen *awt* d'attente sur la période
+* Mise en place du logging (utilisation de ``NotebookCellContent`` dÃ©fini plus haut, et de [Py4J](https://www.py4j.org/)) ;
+* CrÃ©ation d'une session Spark ;
+* CrÃ©ation d'un [Structured Spark Stream](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) Ã  partir d'un flux Kafka ;
+* DÃ©sÃ©rialisation et formatage des messages grÃ¢ce Ã  la fonction Spark ``fromJson`` :
+    * Utilisation d'un schÃ©ma JSON ;
+    * DÃ©finition du format des *timestamp*.
+ * Configuration de la fenÃªtre : *watermark*, *window length*, *sliding interval* ;
+ * ``GroupBy`` par station et pour la fenÃªtre dÃ©finie ;
+* Suppression des doublons de couples (train, heure de dÃ©part) ;
+* CrÃ©ation d'une aggrÃ©gation contenant : 
+    * le nombre *nt* de trains sur la pÃ©riode 
+    * le temps moyen *awt* d'attente sur la pÃ©riode
   ![enter image description here](./pictures/dataframe.png)
-
 
 Partie I & II : Calcul des temps d'attente et de la progression des trains
 --
+
 ### Classe *TransilienStreamProcessor*
-Cette classe implémente l'intégralité des fonctionnalités pour les parties I et II du projet.
+Cette classe implÃ©mente l'intÃ©gralitÃ© des fonctionnalitÃ©s pour les parties I et II du projet.
 
 * Partie I : 
     * *setup_last_hour_awt_stream*
@@ -131,39 +140,59 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I et 
     * *setup_trains_progression_stream*
     * *computeTrainsProgressionAndSaveAsTempView*
 
-### Étapes principales de fonctionnement du consumer 
+### Ã‰tapes principales de fonctionnement du consumer 
 * Import des packages Python requis
 * Mise en place du logging
-* Définition de paramètres de configuration :
-    * Schéma et options de désérialisation
+* DÃ©finition de paramÃ¨tres de configuration :
+    * SchÃ©ma et options de dÃ©sÃ©rialisation
     * Options de la session Spark
     * Source Kafka (broker et topic)
-    * Fenêtre du stream Kafka
-    * Configuration du serveur thrift local
+    * FenÃªtre du stream Kafka
+    * Configuration du serveur Thrift local
 * Instanciation de la classe *TransilienStreamProcessor*
 
 ![enter image description here](./toPandas1.png)
 ![enter image description here](./toPandas2.png)
+
+Interpolation de la position des trains
+--------------------
+
+Les positions des trains Ã©taient initialement calculÃ©es via une simple rÃ¨gle de trois Ã  partir de :
+* La position de leur gare de dÃ©part ;
+* La position de leur gare d'arrivÃ©e ;
+* Leur progression.
+
+Nous avons Ã©voquÃ© cette position comme la position **courante** au sein de ce document.
+
+Cependant, dans le cas de trains directs entre des gares Ã©loignÃ©es, ils pouvaient apparaitre Ã  des emplacements aberrants (dans la Seine, sur des champs, etc.).
+
+Nous avons donc utilisÃ© les informations du fichier **scnf-paths-line-l.json** afin d'interpoler leur position sur les voies ferrÃ©es via *Scipy*. Voici un exemple d'interpolation :
+
+  ![enter image description here](./pictures/Interpolation.png)
+
+Au sein de ce rapport, il s'agit de la position **affinÃ©e**. En fonction du nombre de gÃ©opoints sur un tronÃ§on entre deux gares, diffÃ©rents types d'interpolation sont effectuÃ©s (contrainte de *Scipy*) :
+* Si infÃ©rieur ou Ã©gal Ã  4 : **Interpolation linÃ©aire**
+* Sinon : **Interpolation cubique**
 
 
 
 Tableau Desktop
 =============
 
-Connexion au serveur Thrift local et sources de données
+Connexion au serveur Thrift local et sources de donnÃ©es
 -----------------------------------------------
 
-Depuis l'onglet source de données dans Tableau Desktop, ajout d'une nouvelle connexion de type **Spark SQL**. Le formulaire doit être rempli comme suit :
+Depuis l'onglet source de donnÃ©es dans Tableau Desktop, ajout d'une nouvelle connexion de type **Spark SQL**. Le formulaire doit Ãªtre rempli comme suit :
 
   ![enter image description here](./pictures/Connexion_Tableau_Spark_SQL.png)
 
-Afin de récupérer une vue temporaire créée depuis Spark, il est nécessaire d'ajouter une **Nouvelle requête SQL personnalisée** à la source de données. Elle doit avoir la forme suivante :
+Afin de rÃ©cupÃ©rer une vue temporaire crÃ©Ã©e depuis Spark, il est nÃ©cessaire d'ajouter une **Nouvelle requÃªte SQL personnalisÃ©e** Ã  la source de donnÃ©es. Elle doit avoir la forme suivante :
 
 ```sql
-select * from [nom_de_la_table_désirée]
+select * from [nom_de_la_table_dÃ©sirÃ©e]
 ```
 
-Création des différentes sources de données qui seront nécessaires au projet :
+CrÃ©ation des diffÃ©rentes sources de donnÃ©es qui seront nÃ©cessaires au projet :
 1. Partie 1 :
 	* **global_awt** : Temps d'attente moyen pour la ligne L ;
 	* **max_awt** : Station ayant le temps d'attente moyen le plus important sur la Ligne L, il s'agit d'une *inner join* entre les tables suivantes : *max_awt* et *stations_data* ;
@@ -172,42 +201,42 @@ Création des différentes sources de données qui seront nécessaires au projet :
 2. Partie 2 :
 	* **stations_and_trains** : Stations et trains de la ligne L avec leurs positions, il s'agit d'une *full outer join* entre les tables suivantes : *trains_progression* et *stations_data* ;
 	* **stations_and_trains_with_rail** : Stations et trains de la ligne L avec leurs positions, il s'agit d'une *full outer join* entre :
-		* Une *union* du fichier CSV local *courbe-des-voies_L.csv* sur lui même
+		* Une *union* du fichier CSV local *courbe-des-voies_L.csv* sur lui mÃªme
 		* Et des tables suivantes : *trains_progression* et *stations_data* ;
 	*  **trains_progression** : Trains de la ligne L avec leur progression.
 
 Les *inner join* permettent des jointures classiques.
 
-Les *full outer join* se font sur des conditions fictives toujours fausses, par exemple 0 = 1, afin d'afficher des données de différentes source sur une même feuille dans Tableau Desktop.
+Les *full outer join* se font sur des conditions fictives toujours fausses, par exemple 0 = 1, afin d'afficher des donnÃ©es de diffÃ©rentes source sur une mÃªme feuille dans Tableau Desktop.
 
-Les *union* permettent de dupliquer des données contenant des segments, du moins leur début et leur fin, afin de les afficher sous forme de ligne dans une feuille.
+Les *union* permettent de dupliquer des donnÃ©es contenant des segments, du moins leur dÃ©but et leur fin, afin de les afficher sous forme de ligne dans une feuille.
 
-Dans ces trois cas, des colonnes calculées sont nécessaires afin d'assurer la cohérence des données lors de leur restitution.
+Dans ces trois cas, des colonnes calculÃ©es sont nÃ©cessaires afin d'assurer la cohÃ©rence des donnÃ©es lors de leur restitution.
 
 Partie 1
 --------------------
 
-Les feuilles suivantes sont créées pour cette partie :
-*  **AWT** : Affichage sous forme de *carte* des données de la source *ordered_awt*. Les stations sont colorées en fonction de leur temps d'attente moyen ;
-* **TAB-AWT** : Affichage sous forme de *barres horizontales* des données de la source *ordered_awt*. Les stations sont colorées et ordonnées en fonction de leur temps d'attente moyen ;
-* **MIN-AWT** : Affichage sous forme d'une *barre horizontale* de la donnée de la source *min_awt*. La ligne est colorée en fonction de son temps d'attente moyen ;
-* **MAX-AWT** : Affichage sous forme d'une *barre horizontale* de la donnée de la source *max_awt*. La ligne est colorée en fonction de son temps d'attente moyen ;
-* **GLO-AWT** : Affichage sous forme d'une *barre horizontale* de la donnée de la source *global_awt*. La ligne est colorée en fonction de son temps d'attente moyen ;
+Les feuilles suivantes sont crÃ©Ã©es pour cette partie :
+*  **AWT** : Affichage sous forme de *carte* des donnÃ©es de la source *ordered_awt*. Les stations sont colorÃ©es en fonction de leur temps d'attente moyen ;
+* **TAB-AWT** : Affichage sous forme de *barres horizontales* des donnÃ©es de la source *ordered_awt*. Les stations sont colorÃ©es et ordonnÃ©es en fonction de leur temps d'attente moyen ;
+* **MIN-AWT** : Affichage sous forme d'une *barre horizontale* de la donnÃ©e de la source *min_awt*. La ligne est colorÃ©e en fonction de son temps d'attente moyen ;
+* **MAX-AWT** : Affichage sous forme d'une *barre horizontale* de la donnÃ©e de la source *max_awt*. La ligne est colorÃ©e en fonction de son temps d'attente moyen ;
+* **GLO-AWT** : Affichage sous forme d'une *barre horizontale* de la donnÃ©e de la source *global_awt*. La ligne est colorÃ©e en fonction de son temps d'attente moyen ;
 
-Elles sont rassemblées dans un unique tableau de bord **TAM-LIGNE-L** :
+Elles sont rassemblÃ©es dans un unique tableau de bord **TAM-LIGNE-L** :
 
   ![enter image description here](./pictures/TAM-LIGNE-L.png)
 
 Partie 2
 --------------------
 
-Les feuilles suivantes sont créées pour cette partie :
-* **TRAINS-PROG** : Affichage sous forme de *barres empilées* des données de la source *trains_progression*. Les trains sont colorés en fonction de leur progression via une échelle de couleur fixe, allant toujours de 0 à 100, et ordonnés en fonction de leur mission ;
-* **TRAINS-POS** : Affichage sous forme de *carte* des données de la source *stations_and_trains*. Les stations sont différenciées des trains par leur forme et leur couleur ;
-* **TRAINS-POS-WITH-RAIL** : Affichage sous forme de *carte* des données de la source *stations_and_trains_with_rail*. Les stations sont différenciées des trains et des rails par leur forme et leur couleur. Il est nécessaire d'avoir un axe double au niveau des lignes afin d'afficher sur une même feuille des *lignes* et des *formes*. La position des trains utilisée ici est celle *courante* ;
-* **TRAINS-ACCURATE-POS-WITH-RAIL** : Affichage sous forme de *carte* des données de la source *stations_and_trains_with_rail*. Les stations sont différenciées des trains et des rails par leur forme et leur couleur. Il est nécessaire d'avoir un axe double au niveau des lignes afin d'afficher sur une même feuille des *lignes* et des *formes*. La position des trains utilisée ici est celle *affinée*.
+Les feuilles suivantes sont crÃ©Ã©es pour cette partie :
+* **TRAINS-PROG** : Affichage sous forme de *barres empilÃ©es* des donnÃ©es de la source *trains_progression*. Les trains sont colorÃ©s en fonction de leur progression via une Ã©chelle de couleur fixe, allant toujours de 0 Ã  100, et ordonnÃ©s en fonction de leur mission ;
+* **TRAINS-POS** : Affichage sous forme de *carte* des donnÃ©es de la source *stations_and_trains*. Les stations sont diffÃ©renciÃ©es des trains par leur forme et leur couleur ;
+* **TRAINS-POS-WITH-RAIL** : Affichage sous forme de *carte* des donnÃ©es de la source *stations_and_trains_with_rail*. Les stations sont diffÃ©renciÃ©es des trains et des rails par leur forme et leur couleur. Il est nÃ©cessaire d'avoir un axe double au niveau des lignes afin d'afficher sur une mÃªme feuille des *lignes* et des *formes*. La position des trains utilisÃ©e ici est celle *courante* ;
+* **TRAINS-ACCURATE-POS-WITH-RAIL** : Affichage sous forme de *carte* des donnÃ©es de la source *stations_and_trains_with_rail*. Les stations sont diffÃ©renciÃ©es des trains et des rails par leur forme et leur couleur. Il est nÃ©cessaire d'avoir un axe double au niveau des lignes afin d'afficher sur une mÃªme feuille des *lignes* et des *formes*. La position des trains utilisÃ©e ici est celle *affinÃ©e*.
 
-Les tableaux de bord suivant sont créés pour cette partie :
+Les tableaux de bord suivant sont crÃ©Ã©s pour cette partie :
 * **POS-TRAINS-LIGNE-L** : Rassemble les feuilles *TRAINS-POS* et *TRAINS-PROG* ;
 
   ![enter image description here](./pictures/POS-TRAINS-LIGNE-L.png)
@@ -227,71 +256,53 @@ Les tableaux de bord suivant sont créés pour cette partie :
 Histoire
 --------------------
 
-Les différents tableaux de bord présentés plus haut sont rassemblés dans une histoire **LINE-L** qui illustre les différentes parties de notre projet.
+Les diffÃ©rents tableaux de bord prÃ©sentÃ©s plus haut sont rassemblÃ©s dans une histoire **LINE-L** qui illustre les diffÃ©rentes parties de notre projet.
 
-Traitement et exploitation des données SNCF pour les rails
+
+
+Traitement et exploitation des donnÃ©es SNCF pour les rails
 =============
 
-* Téléchargement des données sur les rails depuis le site [SNCF Open Data](https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/).
+* TÃ©lÃ©chargement des donnÃ©es sur les rails depuis le site [SNCF Open Data](https://ressources.data.sncf.com/explore/dataset/courbe-des-voies/table/).
 
   ![enter image description here](./pictures/France_Rail_Map.png)
 
-* Épuration des données afin de ne garder que les tronçons de la ligne L.
+* Ã‰puration des donnÃ©es afin de ne garder que les tronÃ§ons de la ligne L.
 
   ![enter image description here](./pictures/Line_L_Rail_Map.png)
 
-* Stockage de ces informations sont stockées dans le fichier [*courbe-des-voies_L.csv*](../../tableau/courbe-des-voies_L.csv) et sont exploitation via Tableau Desktop.
+* Stockage de ces informations dans le fichier [*courbe-des-voies_L.csv*](../../tableau/courbe-des-voies_L.csv) qui sera ensuite exploitÃ© via Tableau Desktop.
 
-* Extraction des géopoints uniques de ces segments entre les différentes gares de la ligne, ne sont gardés que ceux des lignes principales (NOM_VOIE = V1).
+* Extraction des gÃ©opoints uniques de ces segments entre les diffÃ©rentes gares de la ligne, ne sont gardÃ©s que ceux des lignes principales (NOM_VOIE = V1).
 
   ![enter image description here](./pictures/Line_L_GeoPoint_Map.png)
 
-Calcul des suites de géopoints des trajets de la ligne L
+Calcul des suites de gÃ©opoints des trajets de la ligne L
 --------------------
 
-À partir de la structure de la ligne :
+Ã€ partir de la structure de la ligne :
 
   ![enter image description here](./pictures/line-l.png)
 
-Définition des branches suivantes :
-* **0** : de Paris-Saint-Lazare à Bécon-les-Bruyères ;
-	* **00** : de Bécon-les-Bruyères à Cergy-le-Haut ;
-	* **01** : de Bécon-les-Bruyères à Saint-Cloud ;
-		* **010** : de Saint-Cloud à Saint-Nom-la-Bretèche-Forêt-de-Marly ;
-			* **0100** : de Saint-Nom-la-Bretèche-Forêt-de-Marly à Saint-Germain-en-Laye-Grande-Ceinture ;
-			* **0100** : de Saint-Nom-la-Bretèche-Forêt-de-Marly à Noisy-le-Roy ;
-		* **011** : de Saint-Cloud à Versailles-Rive-Droite.
+DÃ©finition des branches suivantes :
+* **0** : de Paris-Saint-Lazare Ã  BÃ©con-les-BruyÃ¨res ;
+	* **00** : de BÃ©con-les-BruyÃ¨res Ã  Cergy-le-Haut ;
+	* **01** : de BÃ©con-les-BruyÃ¨res Ã  Saint-Cloud ;
+		* **010** : de Saint-Cloud Ã  Saint-Nom-la-BretÃ¨che-ForÃªt-de-Marly ;
+			* **0100** : de Saint-Nom-la-BretÃ¨che-ForÃªt-de-Marly Ã  Saint-Germain-en-Laye-Grande-Ceinture ;
+			* **0100** : de Saint-Nom-la-BretÃ¨che-ForÃªt-de-Marly Ã  Noisy-le-Roy ;
+		* **011** : de Saint-Cloud Ã  Versailles-Rive-Droite.
 
-Ordonnancement des différentes stations sur leur branche respective en allant de Paris vers la banlieue.
+Ordonnancement des diffÃ©rentes stations sur leur branche respective en allant de Paris vers la banlieue.
 
-Idem avec les géopoints extraits, voir plus haut.
+Idem avec les gÃ©opoints extraits, voir plus haut.
 
-Conception et développement d'un script **generate_geopoints_path_line_l.py** permettant à partir de ces informations de calculer tous les trajets possibles de la ligne L avec leurs géopoints ordonnés et de les sauvegarder dans un fichier **scnf-paths-line-l.json**. Le script se base sur une navigation récursive au sein d'un arbre modélisant la ligne.
-
-Interpolation de la position des trains
---------------------
-
-Les positions des trains étaient initialement calculées via une simple règle de trois à partir de :
-* La position de leur gare de départ ;
-* La position de leur gare d'arrivée ;
-* Leur progression.
-
-Nous avons évoqué cette position comme la position **courante** au sein de ce document.
-
-Cependant, dans le cas de trains directs entre des gares éloignées, ils pouvaient apparaitre à des emplacements aberrants (dans la Seine, sur des champs, etc.).
-
-Nous avons donc utilisé les informations du fichier **scnf-paths-line-l.json** afin d'interpoler leur position sur les voies ferrées via *Scipy*. Voici un exemple d'interpolation :
-
-  ![enter image description here](./pictures/Interpolation.png)
-
-Au sein de ce rapport, il s'agit de la position **affinée**. En fonction du nombre de géopoints sur un tronçon entre deux gares, différents types d'interpolation sont effectués :
-* Peu de points : **Interpolation linéaire**
-* Beaucoup de points : **Interpolation cubique**
+Conception et dÃ©veloppement d'un script **generate_geopoints_path_line_l.py** permettant Ã  partir de ces informations de calculer tous les trajets possibles de la ligne L avec leurs gÃ©opoints ordonnÃ©s et de les sauvegarder dans un fichier **scnf-paths-line-l.json**. Le script se base sur une navigation rÃ©cursive au sein d'un arbre modÃ©lisant la ligne.
 
 
 
 Conclusion
 ======
-A inclure dans la conclusion : pour mettre ce code en production, passer le code des notebooks en scripts Python à exécuter à l'aide de ``Spark submit``
+A inclure dans la conclusion : pour mettre ce code en production, passer le code des notebooks en scripts Python Ã  exÃ©cuter Ã  l'aide de ``Spark submit``
 
 > Written with [StackEdit](https://stackedit.io/).
