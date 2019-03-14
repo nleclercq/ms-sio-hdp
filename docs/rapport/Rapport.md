@@ -203,7 +203,7 @@ Connexion au serveur Thrift local et sources de données
 Depuis l'onglet source de données dans Tableau Desktop, ajout d'une nouvelle connexion de type **Spark SQL**. Le formulaire doit être rempli comme suit :
 
 <p align="center">
-  <img width="550" src= "./pictures/Connexion_Tableau_Spark_SQL.png">
+  <img height="400" src= "./pictures/Connexion_Tableau_Spark_SQL.png">
 </p>
 
 Afin de récupérer une vue temporaire créée depuis Spark, il est nécessaire d'ajouter une **Nouvelle requête SQL personnalisée** à la source de données. Elle doit avoir la forme suivante :
