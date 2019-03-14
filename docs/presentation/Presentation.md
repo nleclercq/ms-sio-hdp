@@ -10,7 +10,7 @@ Sommaire
 1. Schéma du projet
 2. Présentation des notebooks
 3. Position des trains & Tableau Desktop
-4. Points marquants
+4. Quelques détails d'implémentation
 
 Schéma du projet
 ==========
