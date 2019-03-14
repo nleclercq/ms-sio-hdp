@@ -11,7 +11,7 @@ Le but de ce projet est de mettre en œuvre les différents outils de l'écosyst
 
 Les données utilisées sont celles de l'[API temps réel Transilien](https://ressources.data.sncf.com/explore/dataset/api-temps-reel-transilien/information/). Nous nous intéressons en particulier à la ligne L dont nous allons calculer en temps réel les temps d'attente moyens par station et la position des trains sur la ligne et visualiser ces résultats dans Tableau.
 
-La solution décrite permet de répondre à l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des trains est proposée en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
+La solution décrite permet de répondre à l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des trains est proposée dans le notebook Jupyter du *consumer* en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
 
 Installation
 =========
@@ -31,7 +31,7 @@ Les instructions complètes d’installation et de configuration du projet sont 
 * Configuration de Tableau Software.
 
 Travail préliminaire
-==
+====================
 
 Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des stations de la ligne L, ainsi que leur nom et leur position géographique.
  
@@ -52,7 +52,7 @@ Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des 
 ![Extrait de transilien_ligne_l_by_code.json](./pictures/liste_stations.png)
 
 Producer Kafka
-============
+==============
 
 L'ensemble des opérations décrites ci-après correspondent au code du [notebook api-transilien-producer.ipynb](../../api-transilien/api-transilien-producer.ipynb)
 
@@ -69,7 +69,7 @@ Utilitaires
 On a recours aux utilitaires suivants :
 * **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
 * **NotebookCellContent** : classe permettant de router les logs vers une cellule cible du notebook ;
-* **Logging** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
+* **Logging** : *event logging* en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
 * **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
 Description des Classes
@@ -99,21 +99,21 @@ Pour la configuration du *producer*, on utilise un dictionnaire contenant les in
 
 On instancie un ``KafkaProducerTask`` en lui passant en paramètres ce fichier de configuration et on lance ce *producer* de façon asynchrone.
 
-Pour faire les requêtes à l’API Transilien, on itère sur nos login/mdp et sur les stations. Chaque exécution fera donc 3 requêtes : une par couple login/mdp et pour une station différente à chaque fois :
+Pour faire les requêtes à l’API Transilien, on itère sur nos login/mdp et sur les stations. Chaque exécution fera autant de requêtes que de couples login/mdp et pour une station différente à chaque fois :
 
 ![Exemple resultat producer](./pictures/producer.png)
 
 Consumer Kafka
-===
+==============
 
 Partie I : Calcul moyen du temps d'attente moyen par station
----
+------------------------------------------------------------
 
 On explique dans cette partie la façon dont on répond à la question du calcul du temps moyen d'attente par station sur toute la ligne.
 
 Les étapes principales sont les suivantes : 
 * Import des packages (dont ``SparkSessions`` depuis ``pyspark.sql`` ; ``Window`` depuis ``pyspark.sql.window``) ;
-* Mise en place du logging (utilisation de ``NotebookCellContent`` défini plus haut, et de [Py4J](https://www.py4j.org/)) ;
+* Mise en place du *logging* (utilisation de ``NotebookCellContent`` défini plus haut, et de [Py4J](https://www.py4j.org/)) ;
 * Création d'une session Spark ;
 * Création d'un [Structured Spark Stream](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) à partir d'un flux Kafka ;
 * Désérialisation et formatage des messages grâce à la fonction Spark ``fromJson`` :
@@ -121,14 +121,17 @@ Les étapes principales sont les suivantes :
     * Définition du format des *timestamp*.
  * Configuration de la fenêtre : *watermark*, *window length*, *sliding interval* ;
  * ``GroupBy`` par station et pour la fenêtre définie ;
-* Suppression des doublons de couples (train, heure de départ) ;
+* Suppression des doublons de couples {train, heure de départ} ;
 * Création d'une aggrégation contenant : 
     * le nombre *nt* de trains sur la période 
     * le temps moyen *awt* d'attente sur la période
   ![enter image description here](./pictures/dataframe.png)
+  
 
 Partie I & II : Calcul des temps d'attente et de la progression des trains
---
+--------------------------------------------------------------------------
+
+L'impossibilité de réaliser plus d'une opération d'aggrégation sur le stream nous a obligé à trouver une solution de contournement afin de réaliser toutes les requêtes demandées. Pour cela, on effectue les calculs sur chaque *batch* et enregistrons les résultats sous forme de *vues temporaires* via un serveur **thrift**. Les détails sont données pas à pas dans le notebook [notebook api-transilien-consumer.ipynb](../../api-transilien/api-transilien-consumer.ipynb)
 
 ### Classe *TransilienStreamProcessor*
 Cette classe implémente l'intégralité des fonctionnalités pour les parties I et II du projet.
@@ -140,9 +143,9 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
     * *setup_trains_progression_stream*
     * *computeTrainsProgressionAndSaveAsTempView*
 
-### Étapes principales de fonctionnement du consumer 
+### Étapes principales de fonctionnement du *consumer* 
 * Import des packages Python requis
-* Mise en place du logging
+* Mise en place du *logging*
 * Définition de paramètres de configuration :
     * Schéma et options de désérialisation
     * Options de la session Spark
@@ -151,11 +154,11 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
     * Configuration du serveur Thrift local
 * Instanciation de la classe *TransilienStreamProcessor*
 
-![enter image description here](./toPandas1.png)
-![enter image description here](./toPandas2.png)
+![enter image description here](./pictures/toPandas1.PNG)
+![enter image description here](./pictures/toPandas2.PNG)
 
 Interpolation de la position des trains
---------------------
+---------------------------------------
 
 Les positions des trains étaient initialement calculées via une simple règle de trois à partir de :
 * La position de leur gare de départ ;
@@ -256,7 +259,7 @@ Les tableaux de bord suivant sont créés pour cette partie :
 Histoire
 --------------------
 
-Les différents tableaux de bord présentés plus haut sont rassemblés dans une histoire **LINE-L** qui illustre les différentes parties de notre projet.
+Les différents tableaux de bord présentés plus haut sont rassemblés dans une histoire **LIGNE-L** qui illustre les différentes parties de notre projet.
 
 
 
@@ -302,7 +305,10 @@ Conception et développement d'un script **generate_geopoints_path_line_l.py** p
 
 
 Conclusion
-======
+==========
+Dans ce projet, on a utilisé Jupyter....
+
+Pour un déploiement en production, il est possible d'utiliser le script api-;;;;;.sh à l'aide de ``spark submit``.
 A inclure dans la conclusion : pour mettre ce code en production, passer le code des notebooks en scripts Python à exécuter à l'aide de ``Spark submit``
 
 > Written with [StackEdit](https://stackedit.io/).
