@@ -56,13 +56,17 @@ Installation des librairies via pip
 pip install npm
 ```
 
-Installation des librairies via anaconda
+Installation des librairies via conda
 ```sh
-conda install -c conda-forge -y jupyterlab kafka-python pyspark xmltodict nodejs bokeh scipy
+conda install -c conda-forge -y jupyterlab kafka-python pyspark xmltodict 
+
+conda install -c conda-forge -y nodejs bokeh ipywidgets scipy 
 ```
 
-Installation de l'extension jupyterlab de bokeh
+Installation des extension jupyterlab de ipywidgets & bokeh
 ```sh
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
+
 jupyter labextension install jupyterlab_bokeh
 ```
 

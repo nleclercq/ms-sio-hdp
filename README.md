@@ -2,9 +2,9 @@
 ## API Transilien SNCF
 ### P.Hamy, N.Leclercq, L.Poncet
 
-Transilien - Ligne L                    | Transilien - Ligne L       
-:--------------------------------------:|:-------------------------------:
-![](./api-transilien/trains-tracker.gif)| ![](./api-transilien/line-l.png) 
+<p align="center">
+  <img width="700" height="300" src="./api-transilien/line-l.png">
+</p>
 
 * Rapport & Documentation
   * [Rapport](./docs/rapport/Rapport.md)
