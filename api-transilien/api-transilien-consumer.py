@@ -84,7 +84,7 @@ class TransilienStreamProcessor():
         
         # setup logging: timestamp of the last cell clearing (no log  accumulation in nb. cell)
         self.last_clear_outputs_ts = time.time()
-        
+
         # setup logging: show/display train progression table (computation result)
         self.show_trprg_table = self.config.get('show_trprg_table', False)
        
@@ -661,22 +661,22 @@ class TransilienStreamProcessor():
             print(e)
 
 
+# --------------------------------------------------------------------
+if __name__ == "__main__":
 
- if __name__ == "__main__":
-
-	 # configuration parameters
+	# configuration parameters
 	config = {}
 
 	# json schema & options for kafka messages deserialization 
 	config['json_schema'] = st.StructType(
-	    [
-	        st.StructField("station", st.IntegerType(), True),
-	        st.StructField("train", st.StringType(), True),
-	        st.StructField("timestamp", st.TimestampType(), True),
-	        st.StructField("mode", st.StringType(), True),
-	        st.StructField("mission", st.StringType(), True),
-	        st.StructField("terminus", st.IntegerType(), True)
-	    ]
+	[
+	st.StructField("station", st.IntegerType(), True),
+	st.StructField("train", st.StringType(), True),
+	st.StructField("timestamp", st.TimestampType(), True),
+	st.StructField("mode", st.StringType(), True),
+	st.StructField("mission", st.StringType(), True),
+	st.StructField("terminus", st.IntegerType(), True)
+	]
 	)
 	config['json_options'] = {"timestampFormat": "yyyy-MM-dd'T'HH:mm:ss.sss'Z'"}
 
@@ -704,19 +704,19 @@ class TransilienStreamProcessor():
 
 	# list of missions to Paris (for trains direction identification)
 	config['missions_to_paris'] = [
-	    "PALS", "PASA", "PEBU", 
-	    "PEGE", "POPI", "POPU", 
-	    "POSA", "POVA", "POPE"
+	"PALS", "PASA", "PEBU", 
+	"PEGE", "POPI", "POPU", 
+	"POSA", "POVA", "POPE"
 	]
 
 	# misc. options
 	config['auto_start'] = True
 	config['verbose'] = False
 
-    #  instanciate & start the TransilienStreamProcessor
-    tsp = TransilienStreamProcessor()
-    tsp.start()
-    tsp.await_termination()
+	#  instanciate & start the TransilienStreamProcessor
+	tsp = TransilienStreamProcessor()
+	tsp.start()
+	tsp.await_termination()
 
 
 
