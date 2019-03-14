@@ -10,9 +10,29 @@ import pyspark.sql.functions as sf
 from pyspark.sql.window import Window as spark_window
 from py4j.java_gateway import java_import
 
+# --------------------------------------------------------------------
+import py4j
+
+from pyspark import SparkConf
+from pyspark.context import SparkContext
+from pyspark.sql import SparkSession
+
+SparkContext._ensure_initialized()
+
+try:
+    spark = SparkSession._create_shell_session()
+except Exception:
+    import sys
+    import traceback
+    warnings.warn("Failed to initialize Spark session.")
+    traceback.print_exc(file=sys.stderr)
+    sys.exit(1)
+
+import atexit
+atexit.register(lambda: sc.stop())
 
 # --------------------------------------------------------------------
-log4j = sc._jvm.org.apache.log4j
+log4j = spark.sparkContext._jvm.org.apache.log4j
 log4j.LogManager.getRootLogger().setLevel(log4j.Level.ERROR)
 
 # --------------------------------------------------------------------
@@ -436,18 +456,6 @@ class TransilienStreamProcessor():
         print(f"TSP:shutting down Kafka-SparkSession")
         self.kafka_session.stop()
         print(f"`-> done!")
-   
-    # -------------------------------------------------------------------------------
-    def showTrainsProgressionTable(self):
-    # -------------------------------------------------------------------------------
-        # trains progression table will be diplayed        
-        self.show_trprg_table = True
-       
-    # -------------------------------------------------------------------------------
-    def hideTrainsProgressionTable(self):
-    # -------------------------------------------------------------------------------
-        # trains progression table will NOT be diplayed 
-        self.show_trprg_table = False
                        
     # -------------------------------------------------------------------------------
     def computeAwtMetricsAndSaveAsTempViews(self, batch, batch_number):
@@ -456,9 +464,6 @@ class TransilienStreamProcessor():
         # --------------------------------------------
         # this 'forEachBatch' callback is attached to the our 'lhawt_sink' (streaming query)
         try:
-            # clear cell content so that we don't cumulate the log 
-            self.clearOutputs()
-                              
             # be sure we have some data to handle (incoming dataframe not empty)
             # this will avoid creating empty tables on Hive side 
             if batch.rdd.isEmpty():
@@ -510,9 +515,6 @@ class TransilienStreamProcessor():
         # ------------------------------------
         # this 'forEachBatch' callback is attached to the our 'trprg_sink' (streaming query)
         try:    
-            # clear cell content so that we don't cumulate the log               
-            # self.clear_output()
-                              
             # be sure we have some data to handle (incoming dataframe not empty)
             # this will avoid creating empty tables on Hive side 
             if batch.rdd.isEmpty():
@@ -714,7 +716,7 @@ if __name__ == "__main__":
 	config['verbose'] = False
 
 	#  instanciate & start the TransilienStreamProcessor
-	tsp = TransilienStreamProcessor()
+	tsp = TransilienStreamProcessor(config)
 	tsp.start()
 	tsp.await_termination()
 
