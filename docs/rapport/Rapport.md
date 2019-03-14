@@ -69,7 +69,7 @@ Utilitaires
 On a recours aux utilitaires suivants :
 * **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
 * **NotebookCellContent** : classe permettant de router les logs vers une cellule cible du notebook ;
-* **Logging** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
+* **Logging** : *event logging* en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
 * **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
 Description des Classes
@@ -107,7 +107,7 @@ Consumer Kafka
 ==============
 
 Partie I : Calcul moyen du temps d'attente moyen par station
----
+------------------------------------------------------------
 
 On explique dans cette partie la façon dont on répond à la question du calcul du temps moyen d'attente par station sur toute la ligne.
 
@@ -129,7 +129,7 @@ Les étapes principales sont les suivantes :
   
 
 Partie I & II : Calcul des temps d'attente et de la progression des trains
---
+--------------------------------------------------------------------------
 
 L'impossibilité de réaliser plus d'une opération d'aggrégation sur le stream nous a obligé à trouver une solution de contournement afin de réaliser toutes les requêtes demandées. Pour cela, on effectue les calculs sur chaque *batch* et enregistrons les résultats sous forme de *vues temporaires* via un serveur **thrift**. Les détails sont données pas à pas dans le notebook [notebook api-transilien-consumer.ipynb](../../api-transilien/api-transilien-consumer.ipynb)
 
@@ -154,11 +154,11 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
     * Configuration du serveur Thrift local
 * Instanciation de la classe *TransilienStreamProcessor*
 
-![enter image description here](./toPandas1.png)
-![enter image description here](./toPandas2.png)
+![enter image description here](./pictures/toPandas1.png)
+![enter image description here](./pictures/toPandas2.png)
 
 Interpolation de la position des trains
---------------------
+---------------------------------------
 
 Les positions des trains étaient initialement calculées via une simple règle de trois à partir de :
 * La position de leur gare de départ ;
@@ -305,7 +305,10 @@ Conception et développement d'un script **generate_geopoints_path_line_l.py** p
 
 
 Conclusion
-======
+==========
+Dans ce projet, on a utilisé Jupyter....
+
+Pour un déploiement en production, il est possible d'utiliser le script api-;;;;;.sh à l'aide de ``spark submit``.
 A inclure dans la conclusion : pour mettre ce code en production, passer le code des notebooks en scripts Python à exécuter à l'aide de ``Spark submit``
 
 > Written with [StackEdit](https://stackedit.io/).
