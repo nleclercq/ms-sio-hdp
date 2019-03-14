@@ -185,7 +185,7 @@ Cependant, dans le cas de trains directs entre des gares éloignées, ils pouvai
 Nous avons donc utilisé les informations du fichier **scnf-paths-line-l.json** afin d'interpoler leur position sur les voies ferrées via *Scipy*. Voici un exemple d'interpolation :
 
 <p align="center">
-  <img width="550" src= "./pictures/Interpolation.png">
+  <img width="500" src= "./pictures/Interpolation.png">
 </p>
 
 Au sein de ce rapport, il s'agit de la position **affinée**. En fonction du nombre de géopoints sur un tronçon entre deux gares, différents types d'interpolation sont effectués (contrainte de *Scipy*) :
@@ -202,7 +202,9 @@ Connexion au serveur Thrift local et sources de données
 
 Depuis l'onglet source de données dans Tableau Desktop, ajout d'une nouvelle connexion de type **Spark SQL**. Le formulaire doit être rempli comme suit :
 
-  ![enter image description here](./pictures/Connexion_Tableau_Spark_SQL.png)
+<p align="center">
+  <img width="550" src= "./pictures/Connexion_Tableau_Spark_SQL.png">
+</p>
 
 Afin de récupérer une vue temporaire créée depuis Spark, il est nécessaire d'ajouter une **Nouvelle requête SQL personnalisée** à la source de données. Elle doit avoir la forme suivante :
 
