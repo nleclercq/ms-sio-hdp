@@ -280,8 +280,6 @@ Histoire
 
 Les différents tableaux de bord présentés plus haut sont rassemblés dans une histoire **LIGNE-L** qui illustre les différentes parties de notre projet.
 
-
-
 Traitement et exploitation des données SNCF pour les rails
 =============
 
@@ -324,7 +322,7 @@ Conception et développement d'un script **generate_geopoints_path_line_l.py** p
 Bokeh & Google Map comme alternative à Tableau 
 =============
 
-L'animation suivante est une représentation dynamique de données de positions des trains dans un notebook Jupyter. 
+L'animation suivante est une représentation dynamique des données de positions des trains dans un [notebook Jupyter](https://jupyter.org). 
 Ce résultat est obtenu par association de [Bokeh](https://bokeh.pydata.org/en/latest), [Google Map API](https://cloud.google.com/maps-platform/) et de notre classe [Task](../../api-transilien/tools/task/Task.py)
 
 <p align="center">
