@@ -11,12 +11,13 @@ from pyspark.sql.window import Window as spark_window
 from py4j.java_gateway import java_import
 
 
+# --------------------------------------------------------------------
 log4j = sc._jvm.org.apache.log4j
 log4j.LogManager.getRootLogger().setLevel(log4j.Level.ERROR)
 
 # --------------------------------------------------------------------
 # load trains paths data (geolocalized paths from station to station)
-with open("./scnf-paths-line-l.json", "r", encoding="utf-8") as f:
+with open("/root/ms-sio-hdp/api-transilien/scnf-paths-line-l.json", "r", encoding="utf-8") as f:
     g_trains_paths = json.load(f)
 
 # --------------------------------------------------------------------
@@ -83,19 +84,19 @@ class TransilienStreamProcessor():
         
         # setup logging: timestamp of the last cell clearing (no log  accumulation in nb. cell)
         self.last_clear_outputs_ts = time.time()
+        
         # setup logging: show/display train progression table (computation result)
         self.show_trprg_table = self.config.get('show_trprg_table', False)
-        
-        
+       
         # release any existing instance
         if TransilienStreamProcessor.singleton is not None:
-            self.warning("TSP:releasing existing instance...")
+            print("TSP:releasing existing instance...")
             try:
                 TransilienStreamProcessor.singleton.stop()
                 del(TransilienStreamProcessor.singleton)
             except Exception as e:
                 print(e)
-            self.warning("TSP:`-> done!")
+            print("TSP:`-> done!")
             
         # self is the unique TransilienStreamProcessor instance
         TransilienStreamProcessor.singleton = self
@@ -103,11 +104,11 @@ class TransilienStreamProcessor():
         # enable 'accurate trains position' computation
         self.accurate_trains_position_enabled = True
         
-        self.debug("TSP:initializing...")
+        print("TSP:initializing...")
         
         # kafka oriented spark session (i.e. configured to process incoming Kafka messages)
         # we notably specify the thrift server mode and port
-        self.debug(f"TSP:creating kafka oriented spark session")
+        print(f"TSP:creating kafka oriented spark session")
         self.kafka_session = SparkSession \
             .builder \
             .master("yarn") \
@@ -117,17 +118,17 @@ class TransilienStreamProcessor():
             .config('hive.server2.thrift.port', self.config['hive_thrift_server_port']) \
             .enableHiveSupport() \
             .getOrCreate()
-        self.debug("`-> done!")
+        print("`-> done!")
                 
         # average waiting time on the last hour of data (awt): kafka stream setup
-        self.debug(f"TSP:initializing 'last hour awt' stream")
+        print(f"TSP:initializing 'last hour awt' stream")
         self.last_hour_awt_stream = self.__setup_last_hour_awt_stream()
-        self.debug("`-> done!")
+        print("`-> done!")
         
         # real time trains progression: kafka stream setup
-        self.debug(f"TSP:initializing 'trains progression' stream")
+        print(f"TSP:initializing 'trains progression' stream")
         self.trains_progression_stream = self.__setup_trains_progression_stream()
-        self.debug("`-> done!")
+        print("`-> done!")
         
         # start our own thrift server
         # this will allow to expose the temp. views and make them reachable from Tableau Software   
@@ -156,10 +157,7 @@ class TransilienStreamProcessor():
         if self.config['auto_start']:
             self.start()
         
-        self.debug(f"initialization done!")
-        
-        # set actual logging level (the one specified by the configuration)
-        self.set_logging_level(logging.DEBUG if self.config['verbose'] else logging.ERROR)
+        print(f"initialization done!")
         
     # -------------------------------------------------------------------------------
     def __start_thrift_server(self):
@@ -187,19 +185,19 @@ class TransilienStreamProcessor():
         htsp = self.config['hive_thrift_server_port']
         if __is_thrift_server_running(htsp):
             wm = f"TSP:thrift server running on port {htsp}"
-            self.warning(wm) 
+            print(wm) 
             return
         try:
-            self.debug(f"TSP:starting thrift server on port {htsp}") 
+            print(f"TSP:starting thrift server on port {htsp}") 
             #sc.setLogLevel('INFO')
             java_import(sc._gateway.jvm,"")
             sc._gateway.jvm.org.apache.spark.sql \
                        .hive.thriftserver.HiveThriftServer2 \
                        .startWithContext(spark._jwrapped)
             #sc.setLogLevel('ERROR')       
-            self.debug(f"TSP:thrift server successfully started") 
+            print(f"TSP:thrift server successfully started") 
         except Exception as e:
-            self.error(e)
+            print(e)
                        
     # -------------------------------------------------------------------------------
     def __create_stations_view(self):
@@ -334,17 +332,17 @@ class TransilienStreamProcessor():
             try:
                 self.lhawt_sink.awaitTermination()
             except Exception as e:
-                self.debug(e)
+                print(e)
         if self.lhawt_console_sink is not None:
             try:
                 self.lhawt_console_sink.awaitTermination()
             except Exception as e:
-                self.debug(e)
+                print(e)
         if self.trprg_sink is not None:
             try:
                 self.trprg_sink.awaitTermination()
             except Exception as e:
-                self.debug(e)
+                print(e)
                 
     # -------------------------------------------------------------------------------
     def start_last_hour_awt_stream(self):
@@ -355,17 +353,17 @@ class TransilienStreamProcessor():
         proc_time = f"{self.config.get('kafka_lhawt_processing_time', 5.)} seconds"     
         # last hour awt: create then start the (computation) streaming query
         # also make 'self.computeAwtMetricsAndSaveAsTempViews' the 'foreachBatch' callback
-        self.debug(f"TSP:starting 'awt' sink (stream query)")
+        print(f"TSP:starting 'awt' sink (stream query)")
         self.lhawt_sink =  self.last_hour_awt_stream \
                             .writeStream \
                             .trigger(processingTime=proc_time) \
                             .foreachBatch(self.computeAwtMetricsAndSaveAsTempViews) \
                             .outputMode("complete") \
                             .start()
-        self.debug(f"`-> done!")    
+        print(f"`-> done!")    
         if self.config.get('kafka_lhawt_console_sink_enabled', False):
             # last hour awt: create then start the (console) streaming query
-            self.debug(f"TSP:starting 'awt' console stream (stream query)")
+            print(f"TSP:starting 'awt' console stream (stream query)")
             self.lhawt_console_sink = self.last_hour_awt_stream \
                                 .orderBy("awt") \
                                 .writeStream \
@@ -374,7 +372,7 @@ class TransilienStreamProcessor():
                                 .format("console") \
                                 .option("truncate", False) \
                                 .start() 
-        self.debug(f"`-> done!")
+        print(f"`-> done!")
                        
     # -------------------------------------------------------------------------------
     def start_trains_progress_stream(self):
@@ -383,14 +381,14 @@ class TransilienStreamProcessor():
         self.stop_trains_progress_stream()
         # trains progression: create then start the hive sink (streaming query)
         # also make 'self.computeTrainsProgressionAndSaveAsTempView' the 'foreachBatch' callback
-        self.debug(f"TSP:starting trains progression sink (stream query)")
+        print(f"TSP:starting trains progression sink (stream query)")
         self.trprg_sink = self.trains_progression_stream \
                             .writeStream \
                             .foreachBatch(self.computeTrainsProgressionAndSaveAsTempView) \
                             .outputMode("complete") \
                             .start()
-        self.debug(f"`-> done!")
-        self.debug(f"TSP:streaming queries are running")
+        print(f"`-> done!")
+        print(f"TSP:streaming queries are running")
                        
     # -------------------------------------------------------------------------------
     def stop_last_hour_awt_stream(self):
@@ -398,22 +396,22 @@ class TransilienStreamProcessor():
         # stop the streaming queries (best effort impl.)
         if self.lhawt_sink is  not None:
             try:
-                self.debug(f"TSP:stopping 'awt' sink (stream query)")
+                print(f"TSP:stopping 'awt' sink (stream query)")
                 self.lhawt_sink.stop()
             except Exception as e:
                 pass
             finally:
                 self.lhawt_sink = None
-                self.debug(f"`-> done!")
+                print(f"`-> done!")
         if self.lhawt_console_sink is  not None:
             try:
-                self.debug(f"TSP:stopping 'awt' console sink (stream query)")
+                print(f"TSP:stopping 'awt' console sink (stream query)")
                 self.lhawt_console_sink.stop()
             except Exception as e:
                 pass
             finally:
                 self.lhawt_console_sink = None
-                self.debug(f"`-> done!")
+                print(f"`-> done!")
    
     # -------------------------------------------------------------------------------
     def stop_trains_progress_stream(self):
@@ -421,13 +419,13 @@ class TransilienStreamProcessor():
         # stop the streaming queries (best effort impl.)
         if self.trprg_sink is  not None:
             try:
-                self.debug(f"TSP:stopping trains progression sink (stream query)")
+                print(f"TSP:stopping trains progression sink (stream query)")
                 self.trprg_sink.stop()
             except Exception as e:
                 pass
             finally:
                 self.trprg_sink = None
-                self.debug(f"`-> done!")
+                print(f"`-> done!")
                        
     # -------------------------------------------------------------------------------
     def cleanup(self):
@@ -435,30 +433,9 @@ class TransilienStreamProcessor():
         # cleanup the underlying session 
         # TODO: not sure this is the right way to do the job
         self.stop()
-        self.debug(f"TSP:shutting down Kafka-SparkSession")
+        print(f"TSP:shutting down Kafka-SparkSession")
         self.kafka_session.stop()
-        self.debug(f"`-> done!")
-      
-    # -------------------------------------------------------------------------------
-    def turnVerboseOn(self):
-    # -------------------------------------------------------------------------------
-        # turn verbose on          
-        self.set_logging_level(logging.DEBUG)
-       
-    # -------------------------------------------------------------------------------
-    def turnVerboseOff(self):
-    # -------------------------------------------------------------------------------
-        # turn verbose off   
-        self.set_logging_level(logging.ERROR)
-                       
-    # -------------------------------------------------------------------------------
-    def clearOutputs(self):
-    # -------------------------------------------------------------------------------
-        # clear outputs (i.e. clear our 'mother notebook-cell')
-        clear_outputs_period = self.config.get('clear_outputs_period', 15)
-        if (time.time() - self.last_clear_outputs_ts) > clear_outputs_period:
-            self.clear_output()
-            self.last_clear_outputs_ts = time.time()
+        print(f"`-> done!")
    
     # -------------------------------------------------------------------------------
     def showTrainsProgressionTable(self):
@@ -485,46 +462,46 @@ class TransilienStreamProcessor():
             # be sure we have some data to handle (incoming dataframe not empty)
             # this will avoid creating empty tables on Hive side 
             if batch.rdd.isEmpty():
-                self.warning(f"TSP:computeAwtMetrics: ignoring empty batch #{batch_number}")
+                print(f"TSP:computeAwtMetrics: ignoring empty batch #{batch_number}")
                 return
 
-            self.debug(f"TSP:entering computeAwtMetrics for batch #{batch_number}...")
+            print(f"TSP:entering computeAwtMetrics for batch #{batch_number}...")
                               
             # PART-I: Q1.1 & Q1.3: ordered average waiting time in minutes (over last hour)
-            self.debug(f"computing ordered average waiting time...")
+            print(f"computing ordered average waiting time...")
             t = time.time()
             tmp = batch.orderBy(sf.asc("awt")).select(batch.station, batch.awt)    
             self.kafka_session.createDataFrame(tmp.rdd).createOrReplaceTempView("ordered_awt")
-            self.debug(f"`-> took {round(time.time() - t, 2)} s")
+            print(f"`-> took {round(time.time() - t, 2)} s")
                                                                   
             # PART-I: Q1.2: global average waiting time in minutes (over last hour)
-            self.debug(f"computing global average waiting time...")
+            print(f"computing global average waiting time...")
             t = time.time()
             tmp = batch.agg(sf.count("station").alias("number_of_stations"), 
                             sf.avg("awt").alias("global_awt"))
             self.kafka_session.createDataFrame(tmp.rdd).createOrReplaceTempView("global_awt")
-            self.debug(f"`-> took {round(time.time() - t, 2)} s")
+            print(f"`-> took {round(time.time() - t, 2)} s")
             
             # PART-I: Q1.4: min average waiting time in minutes (over last hour)
-            self.debug(f"computing min. average waiting time...")
+            print(f"computing min. average waiting time...")
             t = time.time()
             tmp = batch.orderBy(sf.asc("awt")).limit(1).select(batch.station, 
                                                                batch.awt.alias("min_awt"))
             self.kafka_session.createDataFrame(tmp.rdd).createOrReplaceTempView("min_awt")
-            self.debug(f"`-> took {round(time.time() - t, 2)} s")
+            print(f"`-> took {round(time.time() - t, 2)} s")
            
             # PART-I: Q1.5: max average waiting time in minutes (over last hour)
-            self.debug(f"computing min. average waiting time...")
+            print(f"computing min. average waiting time...")
             t = time.time()
             tmp = batch.orderBy(sf.desc("awt")).limit(1).select(batch.station, 
                                                                 batch.awt.alias("max_awt"))
             self.kafka_session.createDataFrame(tmp.rdd).createOrReplaceTempView("max_awt")
-            self.debug(f"`-> took {round(time.time() - t, 2)} s")
+            print(f"`-> took {round(time.time() - t, 2)} s")
                               
-            self.debug(f"TSP:computeAwtMetrics successfully executed for batch #{batch_number}")
+            print(f"TSP:computeAwtMetrics successfully executed for batch #{batch_number}")
         except Exception as e:
-            self.error(f"TSP:failed to compute awt metrics from batch #{batch_number}")
-            self.error(e)                            
+            print(f"TSP:failed to compute awt metrics from batch #{batch_number}")
+            print(e)                            
                        
     # -------------------------------------------------------------------------------    
     def computeTrainsProgressionAndSaveAsTempView(self, batch, batch_number):
@@ -539,7 +516,7 @@ class TransilienStreamProcessor():
             # be sure we have some data to handle (incoming dataframe not empty)
             # this will avoid creating empty tables on Hive side 
             if batch.rdd.isEmpty():
-                self.warning(f"TSP:computeTrainsProgression ignoring empty batch #{batch_number}")
+                print(f"TSP:computeTrainsProgression ignoring empty batch #{batch_number}")
                 return
 
             t = time.time()
@@ -673,22 +650,73 @@ class TransilienStreamProcessor():
             if self.show_trprg_table:
                 tmp.show()
 
-            # post data to our TrainsTracker (if it exits)
-            if self.trains_tracker is not None:
-                self.trains_tracker.handle_trains_data(tmp.toPandas())
-                
             # create a temp. view that - visible from Tableau  
             self.kafka_session.createDataFrame(tmp.rdd).createOrReplaceTempView("trains_progression")
             
-            self.debug(f"`-> took {round(time.time() - t, 2)} s")
+            print(f"`-> took {round(time.time() - t, 2)} s")
                               
-            self.debug(f"TSP:computeTrainsProgression successfully executed for batch #{batch_number}")
+            print(f"TSP:computeTrainsProgression successfully executed for batch #{batch_number}")
         except Exception as e:
-            self.error(f"TSP:failed to compute trains progression from batch #{batch_number}")
-            self.error(e)
-            
-    # ------------------------------------------------------------------------------- 
-    def set_trains_tracker(self, trains_tracker):
-    # -------------------------------------------------------------------------------
-        assert(isinstance(trains_tracker, Task) or trains_tracker is None)
-        self.trains_tracker = trains_tracker
+            print(f"TSP:failed to compute trains progression from batch #{batch_number}")
+            print(e)
+
+
+
+ if __name__ == "__main__":
+
+	 # configuration parameters
+	config = {}
+
+	# json schema & options for kafka messages deserialization 
+	config['json_schema'] = st.StructType(
+	    [
+	        st.StructField("station", st.IntegerType(), True),
+	        st.StructField("train", st.StringType(), True),
+	        st.StructField("timestamp", st.TimestampType(), True),
+	        st.StructField("mode", st.StringType(), True),
+	        st.StructField("mission", st.StringType(), True),
+	        st.StructField("terminus", st.IntegerType(), True)
+	    ]
+	)
+	config['json_options'] = {"timestampFormat": "yyyy-MM-dd'T'HH:mm:ss.sss'Z'"}
+
+	# spark sesssions options
+	config['spark_sql_shuffle_partitions'] = 4
+
+	# kafka source configuration: broker & topic
+	config['kafka_broker'] = "sandbox-hdp.hortonworks.com:6667"
+	config['kafka_topic'] = "transilien-02"
+
+	# kafka stream configuration: 
+	# structured stream windowing for the last hour average waiting time stream
+	config['kafka_lhawt_stream_watermark'] = 1 
+	config['kafka_lhawt_stream_window_length'] = 60
+	config['kafka_lhawt_stream_sliding_interval'] = 2
+	config['kafka_lhawt_processing_time'] = 2
+	config['kafka_lhawt_console_sink_enabled'] = True 
+
+	# kafka stream configuration: 
+	# pseudo time window for the trains progression stream (logical batch window)
+	config['kafka_trprg_time_window'] = 3600
+
+	# local thrift server configuration
+	config['hive_thrift_server_port'] = 10015
+
+	# list of missions to Paris (for trains direction identification)
+	config['missions_to_paris'] = [
+	    "PALS", "PASA", "PEBU", 
+	    "PEGE", "POPI", "POPU", 
+	    "POSA", "POVA", "POPE"
+	]
+
+	# misc. options
+	config['auto_start'] = True
+	config['verbose'] = False
+
+    #  instanciate & start the TransilienStreamProcessor
+    tsp = TransilienStreamProcessor()
+    tsp.start()
+    tsp.await_termination()
+
+
+
