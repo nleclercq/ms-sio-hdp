@@ -63,17 +63,17 @@ L'ensemble des opérations décrites ci-après correspondent au code du [noteboo
 * Utilisation de la class ``KafkaProducerTask`` pour alimenter Kafka en donnée.
 
 
-Utilitaires
-------------
+Outils
+------
 
-On a recours aux utilitaires suivants :
+On a recours aux outils suivants :
 * **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
 * **NotebookCellContent** : classe permettant de router les logs vers une cellule cible du notebook ;
 * **Logging** : *event logging* en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
 * **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
 Description des Classes
-----------------------------
+-----------------------
 
 ### TransilienAPI
 Cette classe a les deux fonctions principales suivantes : 
@@ -133,17 +133,7 @@ Partie I & II : Calcul des temps d'attente et de la progression des trains
 
 L'impossibilité de réaliser plus d'une opération d'aggrégation sur le stream nous a obligé à trouver une solution de contournement afin de réaliser toutes les requêtes demandées. Pour cela, on effectue les calculs sur chaque *batch* et enregistrons les résultats sous forme de *vues temporaires* via un serveur **thrift**. Les détails sont données pas à pas dans le notebook [notebook api-transilien-consumer.ipynb](../../api-transilien/api-transilien-consumer.ipynb)
 
-### Classe *TransilienStreamProcessor*
-Cette classe implémente l'intégralité des fonctionnalités pour les parties I et II du projet.
-
-* Partie I : 
-    * *setup_last_hour_awt_stream*
-    * *computeAwtMetricsAndSaveAsTempViews*
-*  Partie II : 
-    * *setup_trains_progression_stream*
-    * *computeTrainsProgressionAndSaveAsTempView*
-
-### Étapes principales de fonctionnement du *consumer* 
+Les étapes principales sont les suivantes :
 * Import des packages Python requis
 * Mise en place du *logging*
 * Définition de paramètres de configuration :
@@ -155,6 +145,26 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
 * Instanciation de la classe *TransilienStreamProcessor*
 
 
+### Outils
+
+On a recours aux outils suivants : 
+
+* Serveur **thrift** local
+* Spark User Defined Functions
+* Classe *TransilienStreamProcessor*
+* Configuration de l'instance
+
+
+
+### Classe *TransilienStreamProcessor*
+Cette classe implémente l'intégralité des fonctionnalités pour les parties I et II du projet.
+
+* Partie I : 
+    * *setup_last_hour_awt_stream*
+    * *computeAwtMetricsAndSaveAsTempViews*
+*  Partie II : 
+    * *setup_trains_progression_stream*
+    * *computeTrainsProgressionAndSaveAsTempView*
 
 
 ![enter image description here](./pictures/toPandas1.PNG)
