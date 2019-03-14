@@ -154,8 +154,8 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
     * Configuration du serveur Thrift local
 * Instanciation de la classe *TransilienStreamProcessor*
 
-![enter image description here](./pictures/toPandas1.png)
-![enter image description here](./pictures/toPandas2.png)
+![enter image description here](./pictures/toPandas1.PNG)
+![enter image description here](./pictures/toPandas2.PNG)
 
 Interpolation de la position des trains
 ---------------------------------------
