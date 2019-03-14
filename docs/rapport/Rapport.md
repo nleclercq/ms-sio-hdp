@@ -31,7 +31,7 @@ Les instructions complètes d’installation et de configuration du projet sont 
 * Configuration de Tableau Software.
 
 Travail préliminaire
-==
+====================
 
 Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des stations de la ligne L, ainsi que leur nom et leur position géographique.
  
@@ -69,7 +69,7 @@ Utilitaires
 On a recours aux utilitaires suivants :
 * **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
 * **NotebookCellContent** : classe permettant de router les logs vers une cellule cible du notebook ;
-* **Logging** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
+* ** *Logging* ** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
 * **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
 Description des Classes
@@ -99,12 +99,12 @@ Pour la configuration du *producer*, on utilise un dictionnaire contenant les in
 
 On instancie un ``KafkaProducerTask`` en lui passant en paramètres ce fichier de configuration et on lance ce *producer* de façon asynchrone.
 
-Pour faire les requêtes à l’API Transilien, on itère sur nos login/mdp et sur les stations. Chaque exécution fera donc 3 requêtes : une par couple login/mdp et pour une station différente à chaque fois :
+Pour faire les requêtes à l’API Transilien, on itère sur nos login/mdp et sur les stations. Chaque exécution fera autant de requêtes que de couples login/mdp et pour une station différente à chaque fois :
 
 ![Exemple resultat producer](./pictures/producer.png)
 
 Consumer Kafka
-===
+==============
 
 Partie I : Calcul moyen du temps d'attente moyen par station
 ---
@@ -113,7 +113,7 @@ On explique dans cette partie la façon dont on répond à la question du calcul
 
 Les étapes principales sont les suivantes : 
 * Import des packages (dont ``SparkSessions`` depuis ``pyspark.sql`` ; ``Window`` depuis ``pyspark.sql.window``) ;
-* Mise en place du logging (utilisation de ``NotebookCellContent`` défini plus haut, et de [Py4J](https://www.py4j.org/)) ;
+* Mise en place du *logging* (utilisation de ``NotebookCellContent`` défini plus haut, et de [Py4J](https://www.py4j.org/)) ;
 * Création d'une session Spark ;
 * Création d'un [Structured Spark Stream](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html) à partir d'un flux Kafka ;
 * Désérialisation et formatage des messages grâce à la fonction Spark ``fromJson`` :
@@ -121,7 +121,7 @@ Les étapes principales sont les suivantes :
     * Définition du format des *timestamp*.
  * Configuration de la fenêtre : *watermark*, *window length*, *sliding interval* ;
  * ``GroupBy`` par station et pour la fenêtre définie ;
-* Suppression des doublons de couples (train, heure de départ) ;
+* Suppression des doublons de couples {train, heure de départ} ;
 * Création d'une aggrégation contenant : 
     * le nombre *nt* de trains sur la période 
     * le temps moyen *awt* d'attente sur la période
@@ -143,9 +143,9 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
     * *setup_trains_progression_stream*
     * *computeTrainsProgressionAndSaveAsTempView*
 
-### Étapes principales de fonctionnement du consumer 
+### Étapes principales de fonctionnement du *consumer* 
 * Import des packages Python requis
-* Mise en place du logging
+* Mise en place du *logging*
 * Définition de paramètres de configuration :
     * Schéma et options de désérialisation
     * Options de la session Spark
