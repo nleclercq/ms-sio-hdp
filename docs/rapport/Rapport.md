@@ -11,7 +11,7 @@ Le but de ce projet est de mettre en œuvre les différents outils de l'écosyst
 
 Les données utilisées sont celles de l'[API temps réel Transilien](https://ressources.data.sncf.com/explore/dataset/api-temps-reel-transilien/information/). Nous nous intéressons en particulier à la ligne L dont nous allons calculer en temps réel les temps d'attente moyens par station et la position des trains sur la ligne et visualiser ces résultats dans Tableau.
 
-La solution décrite permet de répondre à l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des trains est proposée en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
+La solution décrite permet de répondre à l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des trains est proposée dans le notebook Jupyter du *consumer* en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
 
 Installation
 =========
@@ -52,7 +52,7 @@ Création du fichier ``transilien_ligne_l_by_code.json`` contenant la liste des 
 ![Extrait de transilien_ligne_l_by_code.json](./pictures/liste_stations.png)
 
 Producer Kafka
-============
+==============
 
 L'ensemble des opérations décrites ci-après correspondent au code du [notebook api-transilien-producer.ipynb](../../api-transilien/api-transilien-producer.ipynb)
 
@@ -126,9 +126,12 @@ Les étapes principales sont les suivantes :
     * le nombre *nt* de trains sur la période 
     * le temps moyen *awt* d'attente sur la période
   ![enter image description here](./pictures/dataframe.png)
+  
 
 Partie I & II : Calcul des temps d'attente et de la progression des trains
 --
+
+L'impossibilité de réaliser plus d'une opération d'aggrégation sur le stream nous a obligé à trouver une solution de contournement afin de réaliser toutes les requêtes demandées. Pour cela, on effectue les calculs sur chaque *batch* et enregistrons les résultats sous forme de *vues temporaires* via un serveur **thrift**. Les détails sont données pas à pas dans le notebook [notebook api-transilien-consumer.ipynb](../../api-transilien/api-transilien-consumer.ipynb)
 
 ### Classe *TransilienStreamProcessor*
 Cette classe implémente l'intégralité des fonctionnalités pour les parties I et II du projet.
