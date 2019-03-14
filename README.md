@@ -19,5 +19,5 @@
 
 
 <p align="center">
-  <img width="700" src="./api-transilien/trains_tracker.gif">
+  <img width="700" src="./api-transilien/trains-tracker.gif">
 </p>
