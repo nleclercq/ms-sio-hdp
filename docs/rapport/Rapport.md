@@ -154,6 +154,9 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
     * Configuration du serveur Thrift local
 * Instanciation de la classe *TransilienStreamProcessor*
 
+
+
+
 ![enter image description here](./pictures/toPandas1.PNG)
 ![enter image description here](./pictures/toPandas2.PNG)
 
@@ -306,9 +309,9 @@ Conception et développement d'un script **generate_geopoints_path_line_l.py** p
 
 Conclusion
 ==========
-Dans ce projet, on a utilisé Jupyter....
+Dans ce projet, on a utilisé la *sandbox* **Hortonworks HDP** pour traiter les données issues de l'**API temps réel SNCF** donnant les horaires des prochains passages en gare des transilien. On s'est intéressé aux trains de la **ligne L**, pour lesquels on a calculé des temps d'attente moyens sur la dernière heure (par gare, pour l'ensemble de la ligne, attente minimale et maximale) ainsi qu'une estimation de la position des trains sur la ligne. Les résultats sont visualisés avec **Tableau Desktop** et **Bokeh**. 
 
-Pour un déploiement en production, il est possible d'utiliser le script api-;;;;;.sh à l'aide de ``spark submit``.
-A inclure dans la conclusion : pour mettre ce code en production, passer le code des notebooks en scripts Python à exécuter à l'aide de ``Spark submit``
+Du point de vue technique, on a utilisé **JupyterLab** et GitHub de façon à documenter de façon la plus transparente ce projet. Pour un déploiement en production, il est possible de regrouper le code dans un [fichier python](../../api-transilien-consumer.py) à lancer via un [script .sh](../../api-transilien-consumer.py) dans ``spark submit``. Le traitement des données obtenues de l'API est fait à l'aide de Spark Streaming, alimenté par un flux Kafka.
 
-> Written with [StackEdit](https://stackedit.io/).
+Ce projet présentait de nombreuses difficultés, tant dans la mise en oeuvre de l'environnement Hortonworks HDP que dans la réalisation technique du projet lui-même. De nombreuses recherches ont été nécessaires pour parvenir à exploiter correctement les informations mises à disposition. Malgré ces challenges, ce projet a aussi été l'occasion de mettre en pratique de façon concrète l'utilisation des outils de l'écosystème Hadoop.
+
