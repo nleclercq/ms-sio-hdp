@@ -31,6 +31,10 @@ Position des trains & Tableau Desktop
 1. Interpolation de la position des trains
 
 <p align="center">
+  <img src="../rapport/pictures/Line_L_GeoPoint_Map.png">
+</p>
+
+<p align="center">
   <img src="../rapport/pictures/Interpolation.png">
 </p>
 
