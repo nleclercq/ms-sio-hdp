@@ -325,10 +325,10 @@ Bokeh & Google Map comme alternative à Tableau
 =============
 
 L'animation suivante est une représentation dynamique de données de positions des trains dans un notebook Jupyter. 
-Ce résultat est obtenu par association de [Bokeh](https://bokeh.pydata.org/en/latest), [Google Map API](https://cloud.google.com/maps-platform/) et de notre classe [Task](./api-transilien/tools/task/Task.py)
+Ce résultat est obtenu par association de [Bokeh](https://bokeh.pydata.org/en/latest), [Google Map API](https://cloud.google.com/maps-platform/) et de notre classe [Task](../../api-transilien/tools/task/Task.py)
 
 <p align="center">
-  <img width="700" src="./api-transilien/trains-tracker.gif">
+  <img width="700" src="../../api-transilien/trains-tracker.gif">
 </p>
 
 
