@@ -35,16 +35,16 @@ Position des trains & Tableau Desktop
 </p>
 
 <p align="center">
-  <img src="../rapport/pictures/Interpolation.png">
+  <img width="500" src="../rapport/pictures/Interpolation.png">
 </p>
 
 2. Tableau Desktop
 
-Points marquants
+Quelques détails d'implémentation 
 ==========
-
 1. Fonctions UDF de Spark
 2. Serveur Thrift & Vues temporaires
+3. Activité Asynchrone dans un Notebook Jupyter
 
 Merci pour votre attention !
 ==========
