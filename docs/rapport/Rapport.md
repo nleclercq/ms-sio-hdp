@@ -69,7 +69,7 @@ Utilitaires
 On a recours aux utilitaires suivants :
 * **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
 * **NotebookCellContent** : classe permettant de router les logs vers une cellule cible du notebook ;
-* ** *Logging* ** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
+* **Logging** : event logging en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
 * **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
 Description des Classes
