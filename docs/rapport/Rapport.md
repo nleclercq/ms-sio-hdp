@@ -13,7 +13,7 @@ Les données utilisées sont celles de l'[API temps réel Transilien](https://re
 
 La solution décrite permet de répondre à l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des trains est proposée dans le notebook Jupyter du *consumer* en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
 
-L'ensemble du développement python a été réalisé au moyen de notebooks Jupyter, qui permettent un travail de développement et d'exploration efficace. Dans ces notebooks, nous avons détaillé avec beaucoup de précision les démarches et les choix effectués. Ce rapport propose de balayer l'essentiel des éléments du projet et on pourra se reporter aux notebooks pour plus de détails sur la mise en œuvre des différents points présentés ici.
+L'ensemble du développement python a été réalisé dans l'environnement Jupyter dont les notebooks permettent un travail de développement et d'exploration efficace. Dans ces notebooks, nous avons détaillé avec beaucoup de précision les démarches et les choix effectués. Ce rapport propose de balayer l'essentiel des éléments du projet et on pourra se reporter aux notebooks pour plus de détails sur la mise en œuvre des différents points présentés ici.
 
 Installation
 =========
