@@ -256,7 +256,7 @@ Les tableaux de bord suivant sont créés pour cette partie :
 Histoire
 --------------------
 
-Les différents tableaux de bord présentés plus haut sont rassemblés dans une histoire **LINE-L** qui illustre les différentes parties de notre projet.
+Les différents tableaux de bord présentés plus haut sont rassemblés dans une histoire **LIGNE-L** qui illustre les différentes parties de notre projet.
 
 
 
