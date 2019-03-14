@@ -166,9 +166,9 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
     * *setup_trains_progression_stream*
     * *computeTrainsProgressionAndSaveAsTempView*
 
-
-![enter image description here](./pictures/toPandas1.PNG)
-![enter image description here](./pictures/toPandas2.PNG)
+<p align="center">
+  <img src= "./pictures/toPandas1.PNG">
+</p>
 
 Interpolation de la position des trains
 ---------------------------------------
@@ -184,7 +184,9 @@ Cependant, dans le cas de trains directs entre des gares éloignées, ils pouvai
 
 Nous avons donc utilisé les informations du fichier **scnf-paths-line-l.json** afin d'interpoler leur position sur les voies ferrées via *Scipy*. Voici un exemple d'interpolation :
 
-  ![enter image description here](./pictures/Interpolation.png)
+<p align="center">
+  <img width="550" src= "./pictures/Interpolation.png">
+</p>
 
 Au sein de ce rapport, il s'agit de la position **affinée**. En fonction du nombre de géopoints sur un tronçon entre deux gares, différents types d'interpolation sont effectués (contrainte de *Scipy*) :
 * Si inférieur ou égal à 4 : **Interpolation linéaire**
@@ -241,7 +243,9 @@ Les feuilles suivantes sont créées pour cette partie :
 
 Elles sont rassemblées dans un unique tableau de bord **TAM-LIGNE-L** :
 
-  ![enter image description here](./pictures/TAM-LIGNE-L.png)
+<p align="center">
+  <img src= "./pictures/TAM-LIGNE-L.png">
+</p>
 
 Partie 2
 --------------------
