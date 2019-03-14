@@ -63,17 +63,17 @@ L'ensemble des opérations décrites ci-après correspondent au code du [noteboo
 * Utilisation de la class ``KafkaProducerTask`` pour alimenter Kafka en donnée.
 
 
-Utilitaires
-------------
+Outils
+------
 
-On a recours aux utilitaires suivants :
+On a recours aux outils suivants :
 * **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
 * **NotebookCellContent** : classe permettant de router les logs vers une cellule cible du notebook ;
 * **Logging** : *event logging* en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
 * **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
 Description des Classes
-----------------------------
+-----------------------
 
 ### TransilienAPI
 Cette classe a les deux fonctions principales suivantes : 
@@ -133,6 +133,29 @@ Partie I & II : Calcul des temps d'attente et de la progression des trains
 
 L'impossibilité de réaliser plus d'une opération d'aggrégation sur le stream nous a obligé à trouver une solution de contournement afin de réaliser toutes les requêtes demandées. Pour cela, on effectue les calculs sur chaque *batch* et enregistrons les résultats sous forme de *vues temporaires* via un serveur **thrift**. Les détails sont données pas à pas dans le notebook [notebook api-transilien-consumer.ipynb](../../api-transilien/api-transilien-consumer.ipynb)
 
+Les étapes principales sont les suivantes :
+* Import des packages Python requis
+* Mise en place du *logging*
+* Définition de paramètres de configuration :
+    * Schéma et options de désérialisation
+    * Options de la session Spark
+    * Source Kafka (broker et topic)
+    * Fenêtre du stream Kafka
+    * Configuration du serveur Thrift local
+* Instanciation de la classe *TransilienStreamProcessor*
+
+
+### Outils
+
+On a recours aux outils suivants : 
+
+* Serveur **thrift** local
+* Spark User Defined Functions
+* Classe *TransilienStreamProcessor*
+* Configuration de l'instance
+
+
+
 ### Classe *TransilienStreamProcessor*
 Cette classe implémente l'intégralité des fonctionnalités pour les parties I et II du projet.
 
@@ -143,16 +166,6 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
     * *setup_trains_progression_stream*
     * *computeTrainsProgressionAndSaveAsTempView*
 
-### Étapes principales de fonctionnement du *consumer* 
-* Import des packages Python requis
-* Mise en place du *logging*
-* Définition de paramètres de configuration :
-    * Schéma et options de désérialisation
-    * Options de la session Spark
-    * Source Kafka (broker et topic)
-    * Fenêtre du stream Kafka
-    * Configuration du serveur Thrift local
-* Instanciation de la classe *TransilienStreamProcessor*
 
 ![enter image description here](./pictures/toPandas1.PNG)
 ![enter image description here](./pictures/toPandas2.PNG)
@@ -306,9 +319,9 @@ Conception et développement d'un script **generate_geopoints_path_line_l.py** p
 
 Conclusion
 ==========
-Dans ce projet, on a utilisé Jupyter....
+Dans ce projet, on a utilisé la *sandbox* **Hortonworks HDP** pour traiter les données issues de l'**API temps réel SNCF** donnant les horaires des prochains passages en gare des transilien. On s'est intéressé aux trains de la **ligne L**, pour lesquels on a calculé des temps d'attente moyens sur la dernière heure (par gare, pour l'ensemble de la ligne, attente minimale et maximale) ainsi qu'une estimation de la position des trains sur la ligne. Les résultats sont visualisés avec **Tableau Desktop** et **Bokeh**. 
 
-Pour un déploiement en production, il est possible d'utiliser le script api-;;;;;.sh à l'aide de ``spark submit``.
-A inclure dans la conclusion : pour mettre ce code en production, passer le code des notebooks en scripts Python à exécuter à l'aide de ``Spark submit``
+Du point de vue technique, on a utilisé **JupyterLab** et GitHub de façon à documenter de façon la plus transparente ce projet. Pour un déploiement en production, il est possible de regrouper le code dans un [fichier python](../../api-transilien-consumer.py) à lancer via un [script .sh](../../api-transilien-consumer.py) dans ``spark submit``. Le traitement des données obtenues de l'API est fait à l'aide de **Spark Streaming**, alimenté par un flux **Kafka**.
 
-> Written with [StackEdit](https://stackedit.io/).
+Ce projet présentait de nombreuses difficultés, tant dans la mise en oeuvre de l'environnement Hortonworks HDP que dans la réalisation technique du projet lui-même. De nombreuses recherches ont été nécessaires pour parvenir à exploiter correctement les informations mises à disposition. Malgré ces challenges, ce projet a aussi été l'occasion de mettre en pratique de façon concrète l'utilisation des outils de l'écosystème Hadoop.
+
