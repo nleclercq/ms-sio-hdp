@@ -1,4 +1,4 @@
-Rapport de projet Hadoop - Transilien
+Présentation du projet Hadoop - Transilien
 =============================
 
 P.Hamy, N.Leclercq, L.Poncet
@@ -10,7 +10,7 @@ Sommaire
 1. Schéma du projet
 2. Présentation des notebooks
 3. Position des trains & Tableau Desktop
-4. Points avancés
+4. Points marquants
 
 Schéma du projet
 ==========
@@ -36,7 +36,7 @@ Position des trains & Tableau Desktop
 
 2. Tableau Desktop
 
-Points avancés
+Points marquants
 ==========
 
 1. Fonctions UDF de Spark
