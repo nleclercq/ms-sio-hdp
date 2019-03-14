@@ -456,18 +456,6 @@ class TransilienStreamProcessor():
         print(f"TSP:shutting down Kafka-SparkSession")
         self.kafka_session.stop()
         print(f"`-> done!")
-   
-    # -------------------------------------------------------------------------------
-    def showTrainsProgressionTable(self):
-    # -------------------------------------------------------------------------------
-        # trains progression table will be diplayed        
-        self.show_trprg_table = True
-       
-    # -------------------------------------------------------------------------------
-    def hideTrainsProgressionTable(self):
-    # -------------------------------------------------------------------------------
-        # trains progression table will NOT be diplayed 
-        self.show_trprg_table = False
                        
     # -------------------------------------------------------------------------------
     def computeAwtMetricsAndSaveAsTempViews(self, batch, batch_number):
@@ -476,9 +464,6 @@ class TransilienStreamProcessor():
         # --------------------------------------------
         # this 'forEachBatch' callback is attached to the our 'lhawt_sink' (streaming query)
         try:
-            # clear cell content so that we don't cumulate the log 
-            self.clearOutputs()
-                              
             # be sure we have some data to handle (incoming dataframe not empty)
             # this will avoid creating empty tables on Hive side 
             if batch.rdd.isEmpty():
@@ -530,9 +515,6 @@ class TransilienStreamProcessor():
         # ------------------------------------
         # this 'forEachBatch' callback is attached to the our 'trprg_sink' (streaming query)
         try:    
-            # clear cell content so that we don't cumulate the log               
-            # self.clear_output()
-                              
             # be sure we have some data to handle (incoming dataframe not empty)
             # this will avoid creating empty tables on Hive side 
             if batch.rdd.isEmpty():
