@@ -56,7 +56,7 @@ Installation des librairies via pip
 pip install npm
 ```
 
-Installation des librairies via anaconda
+Installation des librairies via conda
 ```sh
 conda install -c conda-forge -y jupyterlab kafka-python pyspark xmltodict 
 
