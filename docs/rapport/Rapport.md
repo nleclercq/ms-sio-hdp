@@ -13,6 +13,8 @@ Les données utilisées sont celles de l'[API temps réel Transilien](https://re
 
 La solution décrite permet de répondre à l'ensemble des questions du cahier des charges - bonus inclus. Une solution alternative de visualisation de la position des trains est proposée dans le notebook Jupyter du *consumer* en utilisant la librairie [Bokeh](https://bokeh.pydata.org/en/latest/) et Google Maps.
 
+L'ensemble du développement python a été réalisé dans l'environnement Jupyter dont les notebooks permettent un travail de développement et d'exploration efficace. Dans ces notebooks, nous avons détaillé avec beaucoup de précision les démarches et les choix effectués. Ce rapport propose de balayer l'essentiel des éléments du projet et on pourra se reporter aux notebooks pour plus de détails sur la mise en œuvre des différents points présentés ici.
+
 Installation
 =========
 
@@ -63,17 +65,17 @@ L'ensemble des opérations décrites ci-après correspondent au code du [noteboo
 * Utilisation de la class ``KafkaProducerTask`` pour alimenter Kafka en donnée.
 
 
-Utilitaires
-------------
+Outils
+------
 
-On a recours aux utilitaires suivants :
+On a recours aux outils suivants :
 * **Task** : classe permettant d'exécuter périodiquement une requête à l'API transilien et l'envoi dans un stream Kafka ;
 * **NotebookCellContent** : classe permettant de router les logs vers une cellule cible du notebook ;
 * **Logging** : *event logging* en utilisant la bibliothèque python [logging](https://docs.python.org/3/library/logging.html)  ;
 * **Credentials** : enregistrement dans le fichier ``api_transilien_login.json`` de nos trois couples login / mot de passe d'accès à l'API Transilien.
 
 Description des Classes
-----------------------------
+-----------------------
 
 ### TransilienAPI
 Cette classe a les deux fonctions principales suivantes : 
@@ -133,17 +135,7 @@ Partie I & II : Calcul des temps d'attente et de la progression des trains
 
 L'impossibilité de réaliser plus d'une opération d'aggrégation sur le stream nous a obligé à trouver une solution de contournement afin de réaliser toutes les requêtes demandées. Pour cela, on effectue les calculs sur chaque *batch* et enregistrons les résultats sous forme de *vues temporaires* via un serveur **thrift**. Les détails sont données pas à pas dans le notebook [notebook api-transilien-consumer.ipynb](../../api-transilien/api-transilien-consumer.ipynb)
 
-### Classe *TransilienStreamProcessor*
-Cette classe implémente l'intégralité des fonctionnalités pour les parties I et II du projet.
-
-* Partie I : 
-    * *setup_last_hour_awt_stream*
-    * *computeAwtMetricsAndSaveAsTempViews*
-*  Partie II : 
-    * *setup_trains_progression_stream*
-    * *computeTrainsProgressionAndSaveAsTempView*
-
-### Étapes principales de fonctionnement du *consumer* 
+Les étapes principales sont les suivantes :
 * Import des packages Python requis
 * Mise en place du *logging*
 * Définition de paramètres de configuration :
@@ -155,10 +147,30 @@ Cette classe implémente l'intégralité des fonctionnalités pour les parties I
 * Instanciation de la classe *TransilienStreamProcessor*
 
 
+### Outils
+
+On a recours aux outils suivants : 
+
+* Serveur **thrift** local
+* Spark User Defined Functions
+* Classe *TransilienStreamProcessor*
+* Configuration de l'instance
 
 
-![enter image description here](./pictures/toPandas1.PNG)
-![enter image description here](./pictures/toPandas2.PNG)
+
+### Classe *TransilienStreamProcessor*
+Cette classe implémente l'intégralité des fonctionnalités pour les parties I et II du projet.
+
+* Partie I : 
+    * *setup_last_hour_awt_stream*
+    * *computeAwtMetricsAndSaveAsTempViews*
+*  Partie II : 
+    * *setup_trains_progression_stream*
+    * *computeTrainsProgressionAndSaveAsTempView*
+
+<p align="center">
+  <img src= "./pictures/toPandas1.PNG">
+</p>
 
 Interpolation de la position des trains
 ---------------------------------------
@@ -174,7 +186,9 @@ Cependant, dans le cas de trains directs entre des gares éloignées, ils pouvai
 
 Nous avons donc utilisé les informations du fichier **scnf-paths-line-l.json** afin d'interpoler leur position sur les voies ferrées via *Scipy*. Voici un exemple d'interpolation :
 
-  ![enter image description here](./pictures/Interpolation.png)
+<p align="center">
+  <img width="500" src= "./pictures/Interpolation.png">
+</p>
 
 Au sein de ce rapport, il s'agit de la position **affinée**. En fonction du nombre de géopoints sur un tronçon entre deux gares, différents types d'interpolation sont effectués (contrainte de *Scipy*) :
 * Si inférieur ou égal à 4 : **Interpolation linéaire**
@@ -190,7 +204,9 @@ Connexion au serveur Thrift local et sources de données
 
 Depuis l'onglet source de données dans Tableau Desktop, ajout d'une nouvelle connexion de type **Spark SQL**. Le formulaire doit être rempli comme suit :
 
-  ![enter image description here](./pictures/Connexion_Tableau_Spark_SQL.png)
+<p align="center">
+  <img height="400" src= "./pictures/Connexion_Tableau_Spark_SQL.png">
+</p>
 
 Afin de récupérer une vue temporaire créée depuis Spark, il est nécessaire d'ajouter une **Nouvelle requête SQL personnalisée** à la source de données. Elle doit avoir la forme suivante :
 
@@ -231,7 +247,9 @@ Les feuilles suivantes sont créées pour cette partie :
 
 Elles sont rassemblées dans un unique tableau de bord **TAM-LIGNE-L** :
 
-  ![enter image description here](./pictures/TAM-LIGNE-L.png)
+<p align="center">
+  <img src= "./pictures/TAM-LIGNE-L.png">
+</p>
 
 Partie 2
 --------------------
@@ -263,8 +281,6 @@ Histoire
 --------------------
 
 Les différents tableaux de bord présentés plus haut sont rassemblés dans une histoire **LIGNE-L** qui illustre les différentes parties de notre projet.
-
-
 
 Traitement et exploitation des données SNCF pour les rails
 =============
@@ -305,6 +321,15 @@ Idem avec les géopoints extraits, voir plus haut.
 
 Conception et développement d'un script **generate_geopoints_path_line_l.py** permettant à partir de ces informations de calculer tous les trajets possibles de la ligne L avec leurs géopoints ordonnés et de les sauvegarder dans un fichier **scnf-paths-line-l.json**. Le script se base sur une navigation récursive au sein d'un arbre modélisant la ligne.
 
+Bokeh & Google Map comme alternative à Tableau 
+=============
+
+L'animation suivante est une représentation dynamique des données de positions des trains dans un [notebook Jupyter](https://jupyter.org).
+Ce résultat est obtenu par association de [Bokeh](https://bokeh.pydata.org/en/latest), [Google Map API](https://cloud.google.com/maps-platform/) et de notre classe [Task](../../api-transilien/tools/task/Task.py). Voir la classe [TrainsTracker](../../api-transilien/api-transilien-consumer.ipynb) pour plus de détails.
+
+<p align="center">
+  <img width="700" src="../../api-transilien/trains-tracker.gif">
+</p>
 
 
 Conclusion
