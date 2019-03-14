@@ -321,6 +321,15 @@ Idem avec les géopoints extraits, voir plus haut.
 
 Conception et développement d'un script **generate_geopoints_path_line_l.py** permettant à partir de ces informations de calculer tous les trajets possibles de la ligne L avec leurs géopoints ordonnés et de les sauvegarder dans un fichier **scnf-paths-line-l.json**. Le script se base sur une navigation récursive au sein d'un arbre modélisant la ligne.
 
+Bokeh & Google Map comme alternative à Tableau 
+=============
+
+L'animation suivante est une représentation dynamique de données de positions des trains dans un notebook Jupyter. 
+Ce résultat est obtenu par association de [Bokeh](https://bokeh.pydata.org/en/latest), [Google Map API](https://cloud.google.com/maps-platform/) et de notre classe [Task](./api-transilien/tools/task/Task.py)
+
+<p align="center">
+  <img width="700" src="./api-transilien/trains-tracker.gif">
+</p>
 
 
 Conclusion
