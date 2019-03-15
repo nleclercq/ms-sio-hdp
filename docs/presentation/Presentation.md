@@ -8,7 +8,7 @@ Sommaire
 ==========
 
 1. Schéma du projet
-2. Présentation des notebooks
+2. Implémentation & Démo
 3. Position des trains & Tableau Desktop
 4. Quelques détails d'implémentation
 
@@ -19,7 +19,7 @@ Schéma du projet
   <img src="./project_schema.png">
 </p>
 
-Présentation des notebooks
+Implémentation & Démo
 ==========
 
 1. Producer
